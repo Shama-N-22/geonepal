@@ -369,6 +369,21 @@ function classifyProvince(lat, lng) {
   return best;
 }
 
+/* Nepal only has 77 real districts. BIPAD's incident titles are free text
+   ("Lo Ghekar Damodarkunda Rural Municipality-5"), so storing that raw text
+   as "district" was inflating the count into the hundreds and breaking the
+   district filter (which is built from this real 77-name list). This tries
+   to match a real district name out of the title/place text; if none is
+   found, it honestly falls back to the raw text rather than inventing one. */
+function matchRealDistrict(text) {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const d of ALL_DISTRICTS) {
+    if (lower.includes(d.toLowerCase())) return d;
+  }
+  return null;
+}
+
 async function fetchBipadPage(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("bad status " + res.status);
@@ -384,12 +399,14 @@ async function loadBipadHazard(
 ) {
   const hazard = BIPAD_HAZARD_IDS[disasterType];
   let url = `${BIPAD_BASE_URL}/incident/?hazard=${hazard}&ordering=-incident_on&limit=${pageLimit}&incident_on__gt=${sinceDate}`;
-  let all = [];
+  const seenIds = new Map(); // dedupe by BIPAD's own id — offset-based pagination can occasionally repeat a record across page boundaries
   let pages = 0;
   try {
     while (url && pages < maxPages) {
       const j = await fetchBipadPage(url);
-      all = all.concat(j.results || []);
+      (j.results || []).forEach((r) => {
+        if (r && r.id != null) seenIds.set(r.id, r);
+      });
       url = j.next || null;
       pages++;
     }
@@ -400,6 +417,7 @@ async function loadBipadHazard(
     );
     return [];
   }
+  const all = Array.from(seenIds.values());
 
   return all
     .filter((r) => r.point && Array.isArray(r.point.coordinates)) // skip malformed/missing coordinates rather than crash
@@ -414,6 +432,8 @@ async function loadBipadHazard(
           .trim() ||
         r.streetAddress ||
         "Location not specified";
+      const realDistrict =
+        matchRealDistrict(r.title) || matchRealDistrict(place);
       const factParts = [];
       factParts.push(
         r.verified ? "Verified by BIPAD." : "Not yet verified by BIPAD.",
@@ -430,7 +450,7 @@ async function loadBipadHazard(
         date,
         country: "Nepal",
         province,
-        district: place,
+        district: realDistrict || place, // real district name when we can match one, honest raw place text otherwise
         municipality: place,
         severity: null, // BIPAD gives no severity/magnitude scale — we don't invent one
         verified: !!r.verified,
