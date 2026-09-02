@@ -57,7 +57,7 @@ function openArchive(type) {
   document.getElementById("archTag").style.borderColor = meta.color;
   document.getElementById("archSummary").textContent =
     `Explore ${meta.label.toLowerCase()} recorded across Nepal between 2020 and 2026. ${type === "earthquake" ? "Seismic records combine the live USGS Earthquake Catalog with ground-reported BIPAD incidents." : "Incident records are pulled live from Nepal's BIPAD disaster portal where available, with a demo fallback if the feed is unreachable."}`;
-  document.getElementById("timelineEyebrow").textContent = "2020 → 2026";
+  document.getElementById("timelineEyebrow").textContent = "2026 → 2020";
 
   document.documentElement.style.setProperty(
     "--accent-tint",
@@ -231,7 +231,6 @@ async function loadHeroReel() {
       </a>`,
       )
       .join("");
-    // duplicated so the CSS marquee (translateX -50%) loops seamlessly
     track.innerHTML = cardsHtml + cardsHtml;
   } catch (e) {
     section.style.display = "none";
@@ -246,7 +245,6 @@ async function refreshLiveData() {
   try {
     await loadLiveData();
     await loadAllCommonsImages();
-    attachCommonsImagery();
     await loadAllCategoryMedia();
   } catch (e) {
     console.warn("Live data refresh failed", e);
@@ -271,12 +269,9 @@ async function refreshLiveData() {
     "● Loading live BIPAD / USGS / GDACS feeds…";
   await loadLiveData();
   await loadAllCommonsImages();
-  attachCommonsImagery();
   updateHeroCounts();
   loadHeroReel();
   loadAllCategoryMedia().then(() => {
-    // If the user is already sitting on an archive view when category media
-    // finishes loading, refresh the grid/stats so it appears without a click.
     if (state.disaster) {
       renderStats();
       renderGrid();
