@@ -146,7 +146,6 @@ function provinceOf(district) {
   return "Bagmati";
 }
 
-/* ---------- demo incident generation (flood / landslide) ---------- */
 const FLOOD_NOTES = [
   "River overflow affected low-lying settlements after sustained monsoon rainfall.",
   "Flash flood triggered by heavy upstream rain caused road and bridge damage.",
@@ -201,7 +200,6 @@ function genDemoIncidents(type, year, count) {
   return out;
 }
 
-/* ---------- real reference imagery from Wikimedia Commons (no key required) ---------- */
 const COMMONS_CATEGORIES = {
   flood: "Category:Floods_in_Nepal",
   earthquake: "Category:2015_Nepal_earthquake",
@@ -311,7 +309,6 @@ function parseGdeltDate(seendate) {
   return isNaN(dt) ? null : dt;
 }
 
-/* ---------- honest "no photo" placeholder, built fresh per-incident ---------- */
 function noPhotoCard(labelLine1, labelLine2) {
   const l1 = (labelLine1 || "").slice(0, 34).replace(/[<>&]/g, "");
   const l2 = (labelLine2 || "").slice(0, 34).replace(/[<>&]/g, "");
@@ -353,13 +350,6 @@ function classifyProvince(lat, lng) {
   return best;
 }
 
-/* Real approximate center coordinates for Nepal's real districts (district
-   headquarters area — not surveyed GIS boundaries, but real geographic
-   reference points, not placeholders). Used to classify any real lat/lng
-   into a real Nepal district by nearest center — far more reliable than
-   text-matching BIPAD's free-text titles, and replaces a hash-based fake
-   assignment previously used for GDACS/USGS that had nothing to do with
-   their real coordinates. */
 const DISTRICT_CENTERS = {
   Jhapa: [26.65, 87.98],
   Morang: [26.65, 87.28],
@@ -693,39 +683,74 @@ let MEDIA = {
   landslide: { news: [], video: [], newsLoaded: false, videoLoaded: false },
 };
 
-async function loadCategoryNews(disasterType) {
-  const q = `${disasterType} Nepal`;
-  const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(q)}&mode=artlist&maxrecords=250&format=json&sort=hybridrel&startdatetime=20200101000000&enddatetime=20261231235959`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("bad status " + res.status);
-    const j = await res.json();
-    const raw = (j.articles || [])
-      .map((a, i) => ({
-        id: `gdelt-${disasterType}-${i}`,
-        title: a.title || "Untitled article",
-        url: a.url,
-        domain:
-          a.domain || (a.url ? new URL(a.url).hostname : "Unknown source"),
-        date: parseGdeltDate(a.seendate),
-        image: a.socialimage || null,
-      }))
-      .filter((a) => a.url);
+async function fetchGdeltNews(disasterType) {
+  const url = `/api/gdelt-news?type=${encodeURIComponent(disasterType)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("bad status " + res.status);
+  const j = await res.json();
+  return (j.articles || [])
+    .map((a, i) => ({
+      id: `gdelt-${disasterType}-${i}`,
+      title: a.title || "Untitled article",
+      url: a.url,
+      domain: a.domain || (a.url ? new URL(a.url).hostname : "Unknown source"),
+      date: parseGdeltDate(a.seendate),
+      image: a.socialimage || null,
+      source: "GDELT",
+    }))
+    .filter((a) => a.url);
+}
 
-    const seenImages = new Set();
-    const seenTitles = new Set();
-    const deduped = [];
-    for (const a of raw) {
-      const normTitle = a.title.toLowerCase().trim().replace(/\s+/g, " ");
-      if (a.image && seenImages.has(a.image)) continue;
-      if (seenTitles.has(normTitle)) continue;
-      if (a.image) seenImages.add(a.image);
-      seenTitles.add(normTitle);
-      deduped.push(a);
+async function fetchGoogleNews(disasterType) {
+  const url = `/api/google-news?type=${encodeURIComponent(disasterType)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("bad status " + res.status);
+  const j = await res.json();
+  return (j.items || [])
+    .map((a, i) => ({
+      id: `gnews-${disasterType}-${i}`,
+      title: a.title || "Untitled article",
+      url: a.link,
+      domain:
+        a.source || (a.link ? new URL(a.link).hostname : "Unknown source"),
+      date: a.pubDate ? new Date(a.pubDate) : null,
+      image: null,
+      source: "Google News RSS",
+    }))
+    .filter((a) => a.url);
+}
+
+function dedupeNews(raw) {
+  const seenImages = new Set();
+  const seenTitles = new Set();
+  const deduped = [];
+  for (const a of raw) {
+    const normTitle = (a.title || "").toLowerCase().trim().replace(/\s+/g, " ");
+    if (a.image && seenImages.has(a.image)) continue;
+    if (seenTitles.has(normTitle)) continue;
+    if (a.image) seenImages.add(a.image);
+    seenTitles.add(normTitle);
+    deduped.push(a);
+  }
+  return deduped;
+}
+
+async function loadCategoryNews(disasterType) {
+  try {
+    const gdelt = dedupeNews(await fetchGdeltNews(disasterType));
+    if (gdelt.length) {
+      MEDIA[disasterType].news = gdelt;
+      MEDIA[disasterType].newsLoaded = true;
+      return;
     }
-    MEDIA[disasterType].news = deduped;
   } catch (e) {
     console.warn(`GDELT category fetch failed for ${disasterType}`, e);
+  }
+  try {
+    const gnews = dedupeNews(await fetchGoogleNews(disasterType));
+    MEDIA[disasterType].news = gnews;
+  } catch (e) {
+    console.warn(`Google News RSS fallback also failed for ${disasterType}`, e);
     MEDIA[disasterType].news = [];
   }
   MEDIA[disasterType].newsLoaded = true;
