@@ -1,6 +1,30 @@
 // Second real news source, used only as a fallback when GDELT (api/gdelt-news.js)
 // returns zero results. Google News RSS requires no API key, but like GDELT it's
 // safest fetched server-side rather than directly from the browser.
+// Best-effort real image extraction from the actual publisher page (og:image /
+// twitter:image meta tags) — done server-side to dodge browser CORS, capped
+// with a short timeout so one slow site can't hang the whole request.
+async function extractOgImage(url) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const r = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GeoNepalBot/1.0)' }
+    });
+    clearTimeout(timeout);
+    if (!r.ok) return null;
+    const html = await r.text();
+    const match =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    return match ? match[1] : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   const { type } = req.query;
   if (!type || !['flood', 'earthquake', 'landslide'].includes(type)) {
@@ -34,9 +58,19 @@ export default async function handler(req, res) {
       });
     }
 
+    // Only the first 20 get real-image extraction (bounded time budget) —
+    // never fabricate an image for the rest, they just have none.
+    const toEnrich = items.slice(0, 20);
+    const rest = items.slice(20).map(it => ({ ...it, image: null }));
+    const enriched = await Promise.all(toEnrich.map(async (it) => {
+      const image = await extractOgImage(it.link);
+      return { ...it, image };
+    }));
+    const finalItems = [...enriched, ...rest];
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
-    res.status(200).json({ items });
+    res.status(200).json({ items: finalItems });
   } catch (e) {
     res.status(502).json({ error: 'google news rss fetch failed', message: String(e) });
   }

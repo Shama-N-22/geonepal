@@ -325,6 +325,23 @@ function noPhotoCard(labelLine1, labelLine2) {
 }
 const NO_PHOTO_SVG = noPhotoCard("", "");
 
+/* Separate, honest "no article image" card specifically for news tiles —
+   using the incident placeholder for news made every article with no
+   extracted image look like a broken/blank incident card, which is why the
+   grid looked mostly empty. This one reads clearly as "this is a news item,
+   it just has no image," not "something is broken." */
+function newsNoImageCard() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#14181d"/>
+  <rect x="130" y="90" width="140" height="100" fill="none" stroke="#3a4451" stroke-width="2" rx="4"/>
+  <line x1="150" y1="115" x2="250" y2="115" stroke="#3a4451" stroke-width="3"/>
+  <line x1="150" y1="135" x2="250" y2="135" stroke="#3a4451" stroke-width="3"/>
+  <line x1="150" y1="155" x2="210" y2="155" stroke="#3a4451" stroke-width="3"/>
+  <text x="200" y="225" fill="#6b7480" font-family="monospace" font-size="11" text-anchor="middle" letter-spacing="1">NO ARTICLE IMAGE</text>
+</svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 const BIPAD_BASE_URL = "https://bipadportal.gov.np/api/v1";
 const BIPAD_HAZARD_IDS = { earthquake: 8, flood: 11, landslide: 17 };
 
@@ -714,7 +731,7 @@ async function fetchGoogleNews(disasterType) {
       domain:
         a.source || (a.link ? new URL(a.link).hostname : "Unknown source"),
       date: a.pubDate ? new Date(a.pubDate) : null,
-      image: null,
+      image: a.image || null,
       source: "Google News RSS",
     }))
     .filter((a) => a.url);
@@ -861,7 +878,7 @@ function mediaTilesFor(disasterType, year) {
       title: a.title,
       district: a.domain,
       date: a.date || new Date(),
-      tileImg: a.image || NO_PHOTO_SVG,
+      tileImg: a.image || newsNoImageCard(),
       mediaData: a,
     });
   });
