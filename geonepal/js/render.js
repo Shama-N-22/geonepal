@@ -173,7 +173,7 @@ function renderGrid() {
       return `<div class="tile" data-id="${t.id}" data-ct="${t.contentType}" data-media="${t.isMedia ? "1" : "0"}">
       <span class="type-dot" style="background:${meta.color};color:${meta.color}"></span>
       ${t.demo ? '<span class="demo-tag">DEMO</span>' : '<span class="demo-tag" style="color:#39d97a">LIVE</span>'}
-      <img loading="lazy" src="${t.tileImg}" alt="${t.title}">
+     <img loading="lazy" src="${t.tileImg}" alt="${t.title || "Nepal disaster"}" referrerpolicy="no-referrer">
       <div class="tile-overlay">
         <div class="tile-loc">${typeIcon} ${t.district}</div>
         <div class="tile-date">${t.date ? t.date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Reference"}</div>
