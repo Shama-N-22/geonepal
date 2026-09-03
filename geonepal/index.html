@@ -3,34 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>GeoNepal — Disaster Intelligence Archive</title>
+
+    <meta
+      name="description"
+      content="GeoNepal — a visual intelligence archive of Nepal's floods, earthquakes and landslides."
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
+
     <link rel="stylesheet" href="css/style.css" />
   </head>
+
   <body>
-    <!-- ============ SPLASH ============ -->
+
+    <!-- =========================================================
+         SPLASH SCREEN
+         ========================================================= -->
+
     <div id="splash">
+
       <svg viewBox="0 0 600 260" fill="none">
+
         <path
           class="contour-path p1"
           d="M20,180 C80,140 120,190 170,150 C220,110 260,160 310,120 C360,80 400,130 450,90 C490,60 530,90 580,60"
         />
+
         <path
           class="contour-path p2"
           d="M10,210 C70,175 130,215 190,175 C250,135 290,185 340,150 C400,105 440,155 500,110 C530,90 560,110 590,95"
         />
+
         <path
           class="contour-path p3"
           d="M30,150 C90,105 140,150 200,105 C260,60 300,110 350,70 C400,30 440,75 490,45"
         />
+
         <circle
           class="contour-marker"
           cx="450"
@@ -38,6 +59,7 @@
           r="3.5"
           fill="#ff5a3c"
         />
+
         <circle
           class="contour-marker"
           cx="200"
@@ -45,6 +67,7 @@
           r="3.5"
           fill="#2fa8ff"
         />
+
         <circle
           class="contour-marker"
           cx="340"
@@ -52,238 +75,774 @@
           r="3.5"
           fill="#c99a3a"
         />
+
       </svg>
-      <div class="splash-word">GEO<span>NEPAL</span></div>
-      <div class="splash-sub">Disaster Intelligence Archive · 2020—2026</div>
-      <button class="splash-enter" id="enterBtn">ENTER ARCHIVE →</button>
+
+      <div class="splash-word">
+        GEO<span>NEPAL</span>
+      </div>
+
+      <div class="splash-sub">
+        Disaster Intelligence Archive · 2020—2026
+      </div>
+
+      <button
+        class="splash-enter"
+        id="enterBtn"
+        type="button"
+      >
+        ENTER ARCHIVE →
+      </button>
+
     </div>
 
-    <!-- ============ HEADER ============ -->
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
     <header>
+
       <div class="brand">
+
         <img
           src="assets/tarutium-logo.jpeg"
           alt=""
           class="brand-logo"
           onerror="handleLogoError(this)"
         />
-        <span class="dot"></span>GEO<span style="color: var(--flood)"
-          >NEPAL</span
+
+        <span class="dot"></span>
+
+        GEO<span style="color: var(--flood)">NEPAL</span>
+
+      </div>
+
+
+      <nav class="mainnav" aria-label="Main navigation">
+
+        <a
+          href="#"
+          id="navHome"
+          class="active"
         >
-      </div>
-      <nav class="mainnav">
-        <a href="#" id="navHome" class="active">Home</a>
-        <a href="#" id="navMap">Map</a>
-        <a href="#" id="navTimeline">Timeline</a>
-        <a href="#" id="navCompany">Tarutium</a>
+          Home
+        </a>
+
+        <a
+          href="#"
+          id="navMap"
+        >
+          Map
+        </a>
+
+        <a
+          href="#"
+          id="navTimeline"
+        >
+          Timeline
+        </a>
+
+        <a
+          href="#"
+          id="navCompany"
+        >
+          Tarutium
+        </a>
+
       </nav>
+
+
       <div class="header-right">
-        <div class="status-pill"><span class="live"></span>USGS LIVE</div>
+
+        <div
+          class="status-pill"
+          title="Live earthquake data connection"
+        >
+          <span class="live"></span>
+          USGS LIVE
+        </div>
+
       </div>
+
     </header>
 
-    <!-- ============ HERO ============ -->
-    <section class="hero" id="heroSection">
+
+    <!-- =========================================================
+         HERO / HOME
+         ========================================================= -->
+
+    <section
+      class="hero"
+      id="heroSection"
+    >
+
       <div class="hero-bg"></div>
+
+
       <svg
         class="hero-contours"
         viewBox="0 0 1200 800"
         preserveAspectRatio="none"
+        aria-hidden="true"
       >
+
         <path
           d="M0,600 C150,540 300,620 450,560 C600,500 750,580 900,520 C1000,480 1100,510 1200,470"
           stroke="rgba(255,255,255,0.05)"
           stroke-width="1"
           fill="none"
         />
+
         <path
           d="M0,650 C150,600 320,660 470,610 C640,555 760,620 920,565 C1030,525 1120,555 1200,520"
           stroke="rgba(255,255,255,0.04)"
           stroke-width="1"
           fill="none"
         />
+
         <path
           d="M0,700 C170,660 330,710 480,665 C650,615 780,670 940,615 C1040,580 1130,605 1200,580"
           stroke="rgba(255,255,255,0.035)"
           stroke-width="1"
           fill="none"
         />
+
       </svg>
 
-      <div class="reel-marquee" id="heroReel">
-        <div class="reel-marquee-track" id="reelTrack"></div>
+
+      <!-- =======================================================
+           YOUTUBE VIDEO MARQUEE
+           ======================================================= -->
+
+      <div
+        class="reel-marquee"
+        id="heroReel"
+      >
+
+        <div
+          class="reel-marquee-track"
+          id="reelTrack"
+        ></div>
+
       </div>
 
-      <h1>GEO<span class="accent">NEPAL</span></h1>
+
+      <!-- =======================================================
+           HERO TITLE
+           ======================================================= -->
+
+      <h1>
+        GEO<span class="accent">NEPAL</span>
+      </h1>
+
+
       <p class="lede">
         A visual intelligence archive of Nepal's floods, earthquakes and
         landslides — built on live seismic data, structured incident records,
         and ground-level media.
       </p>
-      <div class="hero-badge" id="liveBadge">
-        ● Loading live USGS earthquake feed…
+
+
+      <div
+        class="hero-badge"
+        id="liveBadge"
+        aria-live="polite"
+      >
+        ● Connecting to live disaster feeds…
       </div>
 
-      <section class="home-news" id="homeNewsSection" style="display: none">
+
+      <!-- =======================================================
+           HOMEPAGE NEWS
+           ======================================================= -->
+
+      <section
+        class="home-news"
+        id="homeNewsSection"
+        style="display: none"
+      >
+
         <div class="home-news-head">
-          <span class="eyebrow">LATEST DISASTER DEVELOPMENTS</span>
+
+          <div>
+
+            <span class="eyebrow">
+              LATEST DISASTER DEVELOPMENTS
+            </span>
+
+            <div
+              style="
+                margin-top: 6px;
+                font-family: var(--font-mono);
+                font-size: 10px;
+                color: var(--text-2);
+              "
+            >
+              LIVE PUBLIC NEWS COVERAGE · FLOODS · EARTHQUAKES · LANDSLIDES
+            </div>
+
+          </div>
+
+
+          <div
+            style="
+              font-family: var(--font-mono);
+              font-size: 10px;
+              color: #39d97a;
+              white-space: nowrap;
+            "
+          >
+            ● LIVE FEED
+          </div>
+
         </div>
-        <div class="home-news-track" id="homeNewsTrack"></div>
+
+
+        <div
+          class="home-news-track"
+          id="homeNewsTrack"
+        >
+
+          <!-- Populated dynamically by main.js/render.js -->
+
+        </div>
+
       </section>
 
+
+      <!-- =======================================================
+           DISASTER CATEGORY CARDS
+           ======================================================= -->
+
       <div class="cat-grid">
-        <div class="cat-card" data-type="flood">
-          <div class="cat-icon">🌊</div>
-          <div class="cat-name">Floods</div>
+
+
+        <!-- FLOODS -->
+
+        <div
+          class="cat-card"
+          data-type="flood"
+          tabindex="0"
+          role="button"
+          aria-label="Explore flood records"
+        >
+
+          <div class="cat-icon">
+            🌊
+          </div>
+
+          <div class="cat-name">
+            Floods
+          </div>
+
           <div class="cat-desc">
             Riverine and monsoon flood incidents across Nepal's provinces.
           </div>
+
           <div class="cat-meta">
+
             <div class="cat-count">
-              <b id="countFlood">—</b> incidents logged
+              <b id="countFlood">—</b>
+              incidents logged
             </div>
-            <div class="cat-explore">EXPLORE →</div>
+
+            <div class="cat-explore">
+              EXPLORE →
+            </div>
+
           </div>
+
         </div>
-        <div class="cat-card" data-type="earthquake">
-          <div class="cat-icon">🌍</div>
-          <div class="cat-name">Earthquakes</div>
+
+
+        <!-- EARTHQUAKES -->
+
+        <div
+          class="cat-card"
+          data-type="earthquake"
+          tabindex="0"
+          role="button"
+          aria-label="Explore earthquake records"
+        >
+
+          <div class="cat-icon">
+            🌍
+          </div>
+
+          <div class="cat-name">
+            Earthquakes
+          </div>
+
           <div class="cat-desc">
             Live seismic events from the USGS catalog, filtered to Nepal.
           </div>
+
           <div class="cat-meta">
+
             <div class="cat-count">
-              <b id="countEarthquake">—</b> incidents logged
+              <b id="countEarthquake">—</b>
+              incidents logged
             </div>
-            <div class="cat-explore">EXPLORE →</div>
+
+            <div class="cat-explore">
+              EXPLORE →
+            </div>
+
           </div>
+
         </div>
-        <div class="cat-card" data-type="landslide">
-          <div class="cat-icon">⛰</div>
-          <div class="cat-name">Landslides</div>
+
+
+        <!-- LANDSLIDES -->
+
+        <div
+          class="cat-card"
+          data-type="landslide"
+          tabindex="0"
+          role="button"
+          aria-label="Explore landslide records"
+        >
+
+          <div class="cat-icon">
+            ⛰
+          </div>
+
+          <div class="cat-name">
+            Landslides
+          </div>
+
           <div class="cat-desc">
             Terrain and slope-failure events across hill and mountain districts.
           </div>
+
           <div class="cat-meta">
+
             <div class="cat-count">
-              <b id="countLandslide">—</b> incidents logged
+              <b id="countLandslide">—</b>
+              incidents logged
             </div>
-            <div class="cat-explore">EXPLORE →</div>
+
+            <div class="cat-explore">
+              EXPLORE →
+            </div>
+
           </div>
+
         </div>
+
       </div>
+
     </section>
 
-    <!-- ============ ARCHIVE VIEW ============ -->
-    <section id="archiveView">
+
+    <!-- =========================================================
+         ARCHIVE VIEW
+         ========================================================= -->
+
+    <section
+      id="archiveView"
+      style="display: none"
+    >
+
+
+      <!-- =======================================================
+           ARCHIVE HEADER
+           ======================================================= -->
+
       <div class="archive-head">
-        <a href="#" class="back-link" id="backLink">← BACK TO NEPAL</a>
+
+        <a
+          href="#"
+          class="back-link"
+          id="backLink"
+        >
+          ← BACK TO NEPAL
+        </a>
+
+
         <div class="archive-title">
-          <h2 id="archTitle">FLOODS</h2>
-          <span class="type-tag" id="archTag">NEPAL</span>
+
+          <h2 id="archTitle">
+            FLOODS
+          </h2>
+
+          <span
+            class="type-tag"
+            id="archTag"
+          >
+            NEPAL
+          </span>
+
         </div>
-        <p class="archive-summary" id="archSummary"></p>
 
-        <div class="year-rail" id="yearRail"></div>
 
-        <div class="stats-bar" id="statsBar"></div>
+        <p
+          class="archive-summary"
+          id="archSummary"
+        ></p>
+
+
+        <!-- YEAR FILTER -->
+
+        <div
+          class="year-rail"
+          id="yearRail"
+        ></div>
+
+
+        <!-- STATS -->
+
+        <div
+          class="stats-bar"
+          id="statsBar"
+        ></div>
+
       </div>
 
+
+      <!-- =======================================================
+           TOOLBAR
+           ======================================================= -->
+
       <div class="toolbar">
+
+
+        <!-- SEARCH -->
+
         <div class="search-box">
-          <span>⌕</span>
+
+          <span aria-hidden="true">
+            ⌕
+          </span>
+
           <input
             type="text"
             id="searchInput"
             placeholder="Search district, municipality, disaster, year…"
+            autocomplete="off"
+            aria-label="Search disaster records"
           />
+
         </div>
-        <div class="chip-row" id="typeChips">
-          <button class="filter-chip active" data-ct="all">ALL</button>
-          <button class="filter-chip" data-ct="news">NEWS</button>
-          <button class="filter-chip" data-ct="video">VIDEOS</button>
-          <button class="filter-chip" data-ct="image">IMAGES</button>
-          <button class="filter-chip" data-ct="incident">INCIDENTS</button>
+
+
+        <!-- CONTENT TYPE -->
+
+        <div
+          class="chip-row"
+          id="typeChips"
+          role="tablist"
+          aria-label="Content type"
+        >
+
+          <button
+            class="filter-chip active"
+            data-ct="all"
+            type="button"
+          >
+            ALL
+          </button>
+
+          <button
+            class="filter-chip"
+            data-ct="news"
+            type="button"
+          >
+            NEWS
+          </button>
+
+          <button
+            class="filter-chip"
+            data-ct="video"
+            type="button"
+          >
+            VIDEOS
+          </button>
+
+          <button
+            class="filter-chip"
+            data-ct="image"
+            type="button"
+          >
+            IMAGES
+          </button>
+
+          <button
+            class="filter-chip"
+            data-ct="incident"
+            type="button"
+          >
+            INCIDENTS
+          </button>
+
         </div>
-        <select class="filter-select" id="provinceSelect">
-          <option value="all">All Provinces</option>
+
+
+        <!-- PROVINCE -->
+
+        <select
+          class="filter-select"
+          id="provinceSelect"
+          aria-label="Filter by province"
+        >
+
+          <option value="all">
+            All Provinces
+          </option>
+
         </select>
-        <select class="filter-select" id="districtSelect">
-          <option value="all">All Districts</option>
+
+
+        <!-- DISTRICT -->
+
+        <select
+          class="filter-select"
+          id="districtSelect"
+          aria-label="Filter by district"
+        >
+
+          <option value="all">
+            All Districts
+          </option>
+
         </select>
-        <select class="filter-select" id="severitySelect">
-          <option value="all">All Severity</option>
-          <option value="Low">Low</option>
-          <option value="Moderate">Moderate</option>
-          <option value="Severe">Severe</option>
-          <option value="Critical">Critical</option>
+
+
+        <!-- SEVERITY -->
+
+        <select
+          class="filter-select"
+          id="severitySelect"
+          aria-label="Filter by severity"
+        >
+
+          <option value="all">
+            All Severity
+          </option>
+
+          <option value="Low">
+            Low
+          </option>
+
+          <option value="Moderate">
+            Moderate
+          </option>
+
+          <option value="Severe">
+            Severe
+          </option>
+
+          <option value="Critical">
+            Critical
+          </option>
+
         </select>
-        <div class="view-toggle">
-          <button class="active" id="galleryBtn">GALLERY</button>
-          <button id="mapBtn">MAP</button>
+
+
+        <!-- VIEW TOGGLE -->
+
+        <div
+          class="view-toggle"
+          role="group"
+          aria-label="Archive view"
+        >
+
+          <button
+            class="active"
+            id="galleryBtn"
+            type="button"
+          >
+            GALLERY
+          </button>
+
+          <button
+            id="mapBtn"
+            type="button"
+          >
+            MAP
+          </button>
+
         </div>
-        <button class="icon-btn" id="refreshBtn" title="Refresh live data">
+
+
+        <!-- REFRESH -->
+
+        <button
+          class="icon-btn"
+          id="refreshBtn"
+          title="Refresh live data"
+          aria-label="Refresh live data"
+          type="button"
+        >
           ⟳
         </button>
+
       </div>
 
-      <div class="archive-grid-wrap" id="galleryPane">
-        <div class="result-count" id="resultCount"></div>
-        <div class="tile-grid" id="tileGrid"></div>
-        <div class="load-more-wrap">
-          <button class="load-more" id="loadMoreBtn">LOAD MORE</button>
+
+      <!-- =======================================================
+           GALLERY
+           ======================================================= -->
+
+      <div
+        class="archive-grid-wrap"
+        id="galleryPane"
+      >
+
+        <div
+          class="result-count"
+          id="resultCount"
+        >
+          LOADING RESULTS…
         </div>
+
+
+        <div
+          class="tile-grid"
+          id="tileGrid"
+        ></div>
+
+
+        <div class="load-more-wrap">
+
+          <button
+            class="load-more"
+            id="loadMoreBtn"
+            type="button"
+          >
+            LOAD MORE
+          </button>
+
+        </div>
+
       </div>
 
-      <div id="mapPane">
+
+      <!-- =======================================================
+           MAP
+           ======================================================= -->
+
+      <div
+        id="mapPane"
+        style="display: none"
+      >
+
         <div class="map-frame">
+
           <div class="map-note">
             Real map — OpenStreetMap. Markers sit at each incident's true
             coordinates. Click a marker for details.
           </div>
-          <div id="leafletMap"></div>
-          <div class="map-legend" id="mapLegend"></div>
+
+          <div
+            id="leafletMap"
+            aria-label="Nepal disaster incident map"
+          ></div>
+
+          <div
+            class="map-legend"
+            id="mapLegend"
+          ></div>
+
         </div>
+
       </div>
 
-      <div class="timeline-section" id="timelineSection">
+
+      <!-- =======================================================
+           TIMELINE
+           ======================================================= -->
+
+      <div
+        class="timeline-section"
+        id="timelineSection"
+      >
+
         <div class="section-heading">
-          <h3>NEPAL DISASTER TIMELINE</h3>
-          <span class="eyebrow" id="timelineEyebrow">2026 → 2020</span>
+
+          <h3>
+            NEPAL DISASTER TIMELINE
+          </h3>
+
+          <span
+            class="eyebrow"
+            id="timelineEyebrow"
+          >
+            2026 → 2020
+          </span>
+
         </div>
-        <div class="timeline-rail" id="timelineRail"></div>
+
+
+        <div
+          class="timeline-rail"
+          id="timelineRail"
+        ></div>
+
       </div>
+
     </section>
 
-    <!-- ============ TARUTIUM / ABOUT PAGE ============ -->
-    <section class="page about-page" id="companyPage">
+
+    <!-- =========================================================
+         TARUTIUM / ABOUT PAGE
+         ========================================================= -->
+
+    <section
+      class="page about-page"
+      id="companyPage"
+      style="display: none"
+    >
+
       <div class="about-bg">
+
         <svg
           class="about-contours"
           viewBox="0 0 1400 900"
           preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
         >
+
           <path
             class="ac-line ac1"
             d="M-50,650 C150,580 350,700 550,610 C750,520 900,640 1100,560 C1250,500 1350,560 1450,520"
           />
+
           <path
             class="ac-line ac2"
             d="M-50,720 C170,660 380,760 580,680 C790,600 940,700 1140,620 C1290,570 1380,610 1450,590"
           />
+
           <path
             class="ac-line ac3"
             d="M-50,540 C180,470 400,590 600,500 C820,410 970,520 1170,440 C1300,390 1380,430 1450,410"
           />
+
           <path
             class="ac-line ac4"
             d="M-50,780 C200,730 420,810 630,740 C850,670 1000,760 1200,690 C1320,650 1400,680 1450,660"
           />
+
         </svg>
+
         <div class="about-gradient"></div>
+
       </div>
+
+
       <div class="page-inner about-inner">
-        <a href="#" class="back-link" id="companyBackLink">← BACK TO HOME</a>
+
+
+        <a
+          href="#"
+          class="back-link"
+          id="companyBackLink"
+        >
+          ← BACK TO HOME
+        </a>
+
+
         <img
           src="assets/tarutium-logo.jpeg"
           alt="Tarutium Global Consulting"
@@ -291,12 +850,34 @@
           onerror="handleLogoError(this)"
         />
 
+
+        <!-- WHY THIS EXISTS -->
+
         <div class="about-fade">
-          <div class="eyebrow" style="margin-bottom: 14px">WHY THIS EXISTS</div>
-          <h2 class="page-title" style="font-size: clamp(32px, 5vw, 52px)">
+
+          <div
+            class="eyebrow"
+            style="margin-bottom: 14px"
+          >
+            WHY THIS EXISTS
+          </div>
+
+          <h2
+            class="page-title"
+            style="
+              font-size: clamp(32px, 5vw, 52px);
+            "
+          >
             Nepal lives with the ground moving beneath it.
           </h2>
-          <p class="page-lede" style="font-size: 16px; max-width: 640px">
+
+          <p
+            class="page-lede"
+            style="
+              font-size: 16px;
+              max-width: 640px;
+            "
+          >
             Nepal sits along one of the most seismically active mountain belts
             on Earth, where the Indian and Eurasian tectonic plates continue to
             collide beneath the Himalaya. The same steep terrain that makes the
@@ -306,9 +887,14 @@
             incidents are recorded here every year, most of them never reaching
             international attention.
           </p>
+
         </div>
 
+
+        <!-- WHY GEONEPAL -->
+
         <div class="about-fade">
+
           <h3
             style="
               font-family: var(--font-display);
@@ -319,7 +905,13 @@
           >
             Why we built GeoNepal
           </h3>
-          <p class="page-lede" style="max-width: 640px">
+
+          <p
+            class="page-lede"
+            style="
+              max-width: 640px;
+            "
+          >
             Data about these events exists — scattered across government
             portals, seismic catalogs, and international databases — but rarely
             in one place, and rarely in a form anyone outside a technical team
@@ -328,30 +920,185 @@
             earthquake catalog, and GDACS, presented as something a person can
             actually explore, incident by incident, year by year.
           </p>
+
         </div>
+
+
+        <!-- DATA SOURCES -->
+
+        <div
+          class="about-fade"
+          style="
+            margin-top: 55px;
+            max-width: 760px;
+          "
+        >
+
+          <div
+            class="eyebrow"
+            style="margin-bottom: 14px"
+          >
+            DATA SOURCES
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(
+                auto-fit,
+                minmax(180px, 1fr)
+              );
+              gap: 10px;
+            "
+          >
+
+            <div
+              style="
+                border: 1px solid var(--panel-border);
+                padding: 16px;
+                background: rgba(255,255,255,.02);
+              "
+            >
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
+                USGS
+              </strong>
+
+              <div
+                style="
+                  margin-top: 5px;
+                  font-family: var(--font-mono);
+                  font-size: 10px;
+                  color: var(--text-2);
+                "
+              >
+                LIVE EARTHQUAKE CATALOG
+              </div>
+            </div>
+
+
+            <div
+              style="
+                border: 1px solid var(--panel-border);
+                padding: 16px;
+                background: rgba(255,255,255,.02);
+              "
+            >
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
+                BIPAD
+              </strong>
+
+              <div
+                style="
+                  margin-top: 5px;
+                  font-family: var(--font-mono);
+                  font-size: 10px;
+                  color: var(--text-2);
+                "
+              >
+                NEPAL INCIDENT RECORDS
+              </div>
+            </div>
+
+
+            <div
+              style="
+                border: 1px solid var(--panel-border);
+                padding: 16px;
+                background: rgba(255,255,255,.02);
+              "
+            >
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
+                GDACS
+              </strong>
+
+              <div
+                style="
+                  margin-top: 5px;
+                  font-family: var(--font-mono);
+                  font-size: 10px;
+                  color: var(--text-2);
+                "
+              >
+                GLOBAL DISASTER ALERTS
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
     </section>
 
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
     <footer>
-      <span
-        >GEONEPAL — DISASTER INTELLIGENCE ARCHIVE · BUILT BY TARUTIUM GLOBAL
-        CONSULTING</span
-      >
-      <span id="footerNote"
-        >EARTHQUAKES: LIVE USGS + BIPAD · FLOODS/LANDSLIDES: LIVE BIPAD
-        (GDACS/DEMO FALLBACK) · PHOTOS/NEWS: HONEST PLACEHOLDER PENDING REAL
-        MEDIA SOURCE</span
-      >
+
+      <span>
+        GEONEPAL — DISASTER INTELLIGENCE ARCHIVE · BUILT BY TARUTIUM GLOBAL
+        CONSULTING
+      </span>
+
+      <span id="footerNote">
+        EARTHQUAKES: LIVE USGS + BIPAD · FLOODS/LANDSLIDES: LIVE BIPAD
+        (GDACS/DEMO FALLBACK) · NEWS: PUBLIC NEWS SOURCES · IMAGES: WIKIMEDIA
+        COMMONS REFERENCE MEDIA
+      </span>
+
     </footer>
 
-    <!-- ============ MODAL ============ -->
-    <div id="modalOverlay">
-      <div class="modal-panel" id="modalPanel"></div>
+
+    <!-- =========================================================
+         MODAL
+         ========================================================= -->
+
+    <div
+      id="modalOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Disaster record details"
+    >
+
+      <div
+        class="modal-panel"
+        id="modalPanel"
+      ></div>
+
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
     <script src="js/data.js"></script>
+
     <script src="js/render.js"></script>
+
     <script src="js/main.js"></script>
+
   </body>
 </html>
