@@ -374,7 +374,7 @@ async function openModal(inc) {
         }
       </div>
       <div class="modal-block" id="gdeltBlock_${inc.id}" style="display:none">
-        <h4>Related News <span style="font-size:10px;color:var(--text-2);font-weight:400;">— general ${meta.label.toLowerCase()} coverage via GDELT, not specific to this incident</span></h4>
+        <h4>Related News <span style="font-size:10px;color:var(--text-2);font-weight:400;">— general ${meta.label.toLowerCase()} coverage, not specific to this incident</span></h4>
         <div id="gdeltContent_${inc.id}"></div>
       </div>
       <div class="modal-block" id="wikiBlock_${inc.id}" style="display:none">
@@ -384,15 +384,8 @@ async function openModal(inc) {
       <div class="modal-block">
         <h4>Videos</h4>
         <div class="video-grid" id="videoGrid_${inc.id}">
-          ${
-            ytApiKey
-              ? `<div style="grid-column:1/-1;font-family:var(--font-mono);font-size:11px;color:var(--text-2)">Loading real videos via YouTube API…</div>`
-              : `
-          <div class="video-tile"><img src="${inc.image}"><div class="play"><span>▶</span></div><div class="vt">Demo footage placeholder</div></div>
-          `
-          }
+          <div style="grid-column:1/-1;font-family:var(--font-mono);font-size:11px;color:var(--text-2)">Loading real videos via YouTube API…</div>
         </div>
-        ${!ytApiKey ? `<div class="demo-note" style="margin-top:10px">◆ Add a YouTube API key in js/data.js to load real coverage here</div>` : ""}
       </div>
       <div class="modal-block">
         <h4>Location</h4>
@@ -412,9 +405,7 @@ async function openModal(inc) {
     if (e.target === overlay) closeModal();
   };
 
-  if (ytApiKey) {
-    fetchYouTube(inc, document.getElementById(`videoGrid_${inc.id}`));
-  }
+  fetchYouTube(inc, document.getElementById(`videoGrid_${inc.id}`));
   if (!inc.demo) {
     loadWikiSummary(inc.disasterType).then((w) => {
       if (!w || !w.extract) return;
@@ -546,7 +537,7 @@ async function fetchYouTube(inc, container) {
     const q = encodeURIComponent(
       `${inc.district} Nepal ${inc.disasterType} ${inc.year}`,
     );
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=4&q=${q}&key=${ytApiKey}`;
+    const url = `/api/youtube?q=${q}&max=4`;
     const res = await fetch(url);
     const j = await res.json();
     if (j.error) {

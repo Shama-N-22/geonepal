@@ -115,7 +115,9 @@ let DB = { flood: [], earthquake: [], landslide: [] };
 let usgsLoaded = false;
 let gdacsLoaded = false;
 
-let ytApiKey = "AIzaSyB3wqxmIdOSmWpnCk4w97T0jFvSKMYrxig";
+/* YouTube key removed from here entirely — it now lives server-side as a
+   Vercel Environment Variable (YOUTUBE_API_KEY) and is read by api/youtube.js.
+   Nothing in this frontend file ever sees the actual key. */
 
 let state = {
   disaster: null,
@@ -325,11 +327,6 @@ function noPhotoCard(labelLine1, labelLine2) {
 }
 const NO_PHOTO_SVG = noPhotoCard("", "");
 
-/* Separate, honest "no article image" card specifically for news tiles —
-   using the incident placeholder for news made every article with no
-   extracted image look like a broken/blank incident card, which is why the
-   grid looked mostly empty. This one reads clearly as "this is a news item,
-   it just has no image," not "something is broken." */
 function newsNoImageCard() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
   <rect width="400" height="300" fill="#14181d"/>
@@ -700,39 +697,20 @@ let MEDIA = {
   landslide: { news: [], video: [], newsLoaded: false, videoLoaded: false },
 };
 
-async function fetchGdeltNews(disasterType) {
-  const url = `/api/gdelt-news?type=${encodeURIComponent(disasterType)}`;
+async function fetchNews(disasterType) {
+  const url = `/api/news?type=${encodeURIComponent(disasterType)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("bad status " + res.status);
   const j = await res.json();
   return (j.articles || [])
     .map((a, i) => ({
-      id: `gdelt-${disasterType}-${i}`,
+      id: `news-${disasterType}-${i}`,
       title: a.title || "Untitled article",
       url: a.url,
-      domain: a.domain || (a.url ? new URL(a.url).hostname : "Unknown source"),
-      date: parseGdeltDate(a.seendate),
-      image: a.socialimage || null,
-      source: "GDELT",
-    }))
-    .filter((a) => a.url);
-}
-
-async function fetchGoogleNews(disasterType) {
-  const url = `/api/google-news?type=${encodeURIComponent(disasterType)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("bad status " + res.status);
-  const j = await res.json();
-  return (j.items || [])
-    .map((a, i) => ({
-      id: `gnews-${disasterType}-${i}`,
-      title: a.title || "Untitled article",
-      url: a.link,
-      domain:
-        a.source || (a.link ? new URL(a.link).hostname : "Unknown source"),
-      date: a.pubDate ? new Date(a.pubDate) : null,
-      image: a.image || null,
-      source: "Google News RSS",
+      domain: a.sourceName || "Unknown source",
+      date: a.publishedAt ? new Date(a.publishedAt) : null,
+      image: a.imageUrl || null,
+      source: a.apiSource || "News",
     }))
     .filter((a) => a.url);
 }
@@ -754,32 +732,18 @@ function dedupeNews(raw) {
 
 async function loadCategoryNews(disasterType) {
   try {
-    const gdelt = dedupeNews(await fetchGdeltNews(disasterType));
-    if (gdelt.length) {
-      MEDIA[disasterType].news = gdelt;
-      MEDIA[disasterType].newsLoaded = true;
-      return;
-    }
+    const news = dedupeNews(await fetchNews(disasterType));
+    MEDIA[disasterType].news = news;
   } catch (e) {
-    console.warn(`GDELT category fetch failed for ${disasterType}`, e);
-  }
-  try {
-    const gnews = dedupeNews(await fetchGoogleNews(disasterType));
-    MEDIA[disasterType].news = gnews;
-  } catch (e) {
-    console.warn(`Google News RSS fallback also failed for ${disasterType}`, e);
+    console.warn(`News fetch failed for ${disasterType}`, e);
     MEDIA[disasterType].news = [];
   }
   MEDIA[disasterType].newsLoaded = true;
 }
 
 async function loadCategoryVideos(disasterType) {
-  if (!ytApiKey) {
-    MEDIA[disasterType].videoLoaded = true;
-    return;
-  }
   const q = encodeURIComponent(`${disasterType} Nepal disaster`);
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=16&q=${q}&key=${ytApiKey}`;
+  const url = `/api/youtube?q=${q}&max=16`;
   try {
     const res = await fetch(url);
     const j = await res.json();

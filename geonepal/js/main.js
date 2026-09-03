@@ -14,7 +14,7 @@ function handleLogoError(img) {
     img.dataset.logoAttempt = attempt + 1;
     img.src = LOGO_FALLBACKS[attempt];
   } else {
-    img.style.display = "none"; // hide cleanly instead of showing a broken-image icon
+    img.style.display = "none";
   }
 }
 
@@ -203,13 +203,9 @@ setTimeout(() => {
 async function loadHeroReel() {
   const track = document.getElementById("reelTrack");
   const section = document.getElementById("heroReel");
-  if (!ytApiKey) {
-    section.style.display = "none";
-    return;
-  }
   try {
     const q = encodeURIComponent("Nepal flood earthquake landslide disaster");
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=16&q=${q}&key=${ytApiKey}`;
+    const url = `/api/youtube?q=${q}&max=16`;
     const res = await fetch(url);
     const j = await res.json();
     if (j.error || !j.items || !j.items.length) {
