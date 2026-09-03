@@ -2,7 +2,10 @@
    GEONEPAL — MAIN CONTROLLER
    ================================================================ */
 
-/* ---------- logo fallback ---------- */
+
+/* ================================================================
+   LOGO FALLBACK
+   ================================================================ */
 
 const LOGO_FALLBACKS = [
   "assets/tarutium-logo.jpg",
@@ -90,10 +93,16 @@ function setView(view) {
   }
 
   if (view === "map") {
-    setTimeout(
-      renderMap,
-      50,
-    );
+    setTimeout(() => {
+      try {
+        renderMap();
+      } catch (e) {
+        console.warn(
+          "Map rendering failed",
+          e,
+        );
+      }
+    }, 100);
   }
 }
 
@@ -141,13 +150,13 @@ function openArchive(type) {
     .querySelectorAll(
       ".filter-chip",
     )
-    .forEach((c) =>
+    .forEach((c) => {
       c.classList.toggle(
         "active",
         c.dataset.ct ===
           "all",
-      ),
-    );
+      );
+    });
 
   const provinceSelect =
     document.getElementById(
@@ -184,7 +193,14 @@ function openArchive(type) {
   const meta =
     TYPE_META[type];
 
-  if (!meta) return;
+  if (!meta) {
+    console.warn(
+      "Unknown disaster type:",
+      type,
+    );
+
+    return;
+  }
 
   const archTitle =
     document.getElementById(
@@ -239,8 +255,7 @@ function openArchive(type) {
 
   document.documentElement.style.setProperty(
     "--accent-tint",
-    meta.color +
-      "22",
+    `${meta.color}22`,
   );
 
   renderYearRail();
@@ -359,8 +374,7 @@ function showSection(name) {
   const map = {
     hero: "navHome",
     archive: "navHome",
-    company:
-      "navCompany",
+    company: "navCompany",
   };
 
   const activeLink =
@@ -395,8 +409,10 @@ function initAboutFadeIn() {
     );
 
   if (
-    !("IntersectionObserver" in
-      window)
+    !(
+      "IntersectionObserver" in
+      window
+    )
   ) {
     els.forEach((el) =>
       el.classList.add(
@@ -448,10 +464,21 @@ document
   .forEach((card) => {
     card.addEventListener(
       "click",
-      () =>
-        openArchive(
-          card.dataset.type,
-        ),
+      () => {
+        const type =
+          card.dataset.type;
+
+        if (!type) {
+          console.warn(
+            "Disaster card is missing data-type:",
+            card,
+          );
+
+          return;
+        }
+
+        openArchive(type);
+      },
     );
   });
 
@@ -464,6 +491,7 @@ const backLink =
 if (backLink) {
   backLink.onclick = (e) => {
     e.preventDefault();
+
     closeArchive();
   };
 }
@@ -602,6 +630,13 @@ if (provinceSelect) {
       renderGrid();
       renderStats();
       renderTimeline();
+
+      if (
+        state.view ===
+        "map"
+      ) {
+        renderMap();
+      }
     },
   );
 }
@@ -625,6 +660,13 @@ if (districtSelect) {
       renderGrid();
       renderStats();
       renderTimeline();
+
+      if (
+        state.view ===
+        "map"
+      ) {
+        renderMap();
+      }
     },
   );
 }
@@ -689,6 +731,7 @@ if (navMap) {
 
     if (state.disaster) {
       showSection("archive");
+
       setView("map");
 
       const archiveView =
@@ -697,7 +740,10 @@ if (navMap) {
         );
 
       if (archiveView) {
-        archiveView.scrollIntoView();
+        archiveView.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     } else {
       showSection("hero");
@@ -725,8 +771,7 @@ if (navTimeline) {
 
       if (timelineSection) {
         timelineSection.scrollIntoView({
-          behavior:
-            "smooth",
+          behavior: "smooth",
         });
       }
     } else {
@@ -794,7 +839,12 @@ document.body.addEventListener(
       e.key ===
       "Escape"
     ) {
-      closeModal();
+      if (
+        typeof closeModal ===
+        "function"
+      ) {
+        closeModal();
+      }
     }
   },
 );
@@ -899,7 +949,7 @@ async function loadHeroReel() {
         .map(
           (v) => {
             const thumb =
-              v.snippet
+              v?.snippet
                 ?.thumbnails
                 ?.medium
                 ?.url;
@@ -910,7 +960,7 @@ async function loadHeroReel() {
 
             const title =
               String(
-                v.snippet
+                v?.snippet
                   ?.title ||
                   "",
               )
@@ -929,19 +979,25 @@ async function loadHeroReel() {
                 .replace(
                   /"/g,
                   "&quot;",
+                )
+                .replace(
+                  /'/g,
+                  "&#39;",
                 );
+
+            const videoId =
+              encodeURIComponent(
+                v.id.videoId,
+              );
 
             return `
               <a
                 class="marquee-card"
-                href="https://www.youtube.com/watch?v=${encodeURIComponent(
-                  v.id.videoId,
-                )}"
+                href="https://www.youtube.com/watch?v=${videoId}"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="${title}"
               >
-
                 <img
                   src="${thumb}"
                   loading="lazy"
@@ -952,7 +1008,6 @@ async function loadHeroReel() {
                 <span class="mc-live">
                   VIDEO
                 </span>
-
               </a>
             `;
           },
@@ -1109,6 +1164,7 @@ async function refreshLiveData() {
       Build the initial UI before
       contacting live services.
     */
+
     renderProvinceOptions();
 
     renderDistrictOptions();
@@ -1132,6 +1188,7 @@ async function refreshLiveData() {
       If this succeeds, the dashboard
       immediately has its main records.
     */
+
     await loadLiveData();
 
     updateHeroCounts();
@@ -1145,6 +1202,7 @@ async function refreshLiveData() {
       Commons imagery is independent
       from the incident feeds.
     */
+
     if (
       typeof loadAllCommonsImages ===
       "function"
@@ -1158,12 +1216,14 @@ async function refreshLiveData() {
       Hero video strip loads independently.
       It should never block the archive.
     */
+
     loadHeroReel();
 
     /*
       Load news/video media before rendering
       the homepage news section.
     */
+
     if (
       typeof loadAllCategoryMedia ===
       "function"
@@ -1176,6 +1236,7 @@ async function refreshLiveData() {
       Render homepage news AFTER the media
       request has completed.
     */
+
     renderHomeNews();
 
     updateHeroCounts();
@@ -1184,6 +1245,7 @@ async function refreshLiveData() {
       If an archive was already selected,
       render its complete UI.
     */
+
     if (state.disaster) {
       renderYearRail();
       renderStats();
@@ -1218,15 +1280,22 @@ async function refreshLiveData() {
       the existing demo/previous data
       remains usable.
     */
-    renderHomeNews();
 
-    updateHeroCounts();
+    try {
+      renderHomeNews();
+      updateHeroCounts();
 
-    if (state.disaster) {
-      renderYearRail();
-      renderStats();
-      renderGrid();
-      renderTimeline();
+      if (state.disaster) {
+        renderYearRail();
+        renderStats();
+        renderGrid();
+        renderTimeline();
+      }
+    } catch (renderError) {
+      console.error(
+        "Fallback rendering failed",
+        renderError,
+      );
     }
   }
 })();

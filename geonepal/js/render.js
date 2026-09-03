@@ -125,7 +125,8 @@ function getArticleDate(article) {
 
   if (!raw) return 0;
 
-  const time = new Date(raw).getTime();
+  const time =
+    new Date(raw).getTime();
 
   return Number.isNaN(time)
     ? 0
@@ -138,564 +139,9 @@ function getArticleDate(article) {
    ================================================================ */
 
 function getFilteredTiles() {
-  if (!state.disaster) return [];
-
-  let incidents = DB[state.disaster] || [];
-
-  if (state.year !== "all") {
-    incidents = incidents.filter(
-      (d) => d.year === state.year,
-    );
+  if (!state.disaster) {
+    return [];
   }
-
-  if (state.province !== "all") {
-    incidents = incidents.filter(
-      (d) => d.province === state.province,
-    );
-  }
-
-  if (state.district !== "all") {
-    incidents = incidents.filter(
-      (d) => d.district === state.district,
-    );
-  }
-
-  if (state.severity !== "all") {
-    incidents = incidents.filter(
-      (d) => d.severity === state.severity,
-    );
-  }
-
-  let tiles = expandTiles(incidents);
-
-  if (
-    state.province === "all" &&
-    state.district === "all" &&
-    state.severity === "all"
-  ) {
-    tiles = tiles.concat(
-      mediaTilesFor(
-        state.disaster,
-        state.year,
-      ),
-    );
-  }
-
-  if (state.contentType !== "all") {
-    tiles = tiles.filter(
-      (t) => t.contentType === state.contentType,
-    );
-  }
-
-  const query = state.search
-    .trim()
-    .toLowerCase();
-
-  if (query) {
-    tiles = tiles.filter((t) => {
-      const fields = [
-        t.id,
-        t.district,
-        t.province,
-        t.title,
-        t.year,
-        t.disasterType,
-        t.municipality,
-        t.contentType,
-        t.description,
-        t.mediaData?.source,
-        t.mediaData?.domain,
-        t.mediaData?.channel,
-        t.mediaData?.artist,
-      ];
-
-      return fields.some(
-        (field) =>
-          String(field ?? "")
-            .toLowerCase()
-            .includes(query),
-      );
-    });
-  }
-
-  return tiles;
-}
-
-
-/* ================================================================
-   HERO COUNTS
-   ================================================================ */
-
-function updateHeroCounts() {
-  const floodCount =
-    document.getElementById("countFlood");
-
-  const earthquakeCount =
-    document.getElementById("countEarthquake");
-
-  const landslideCount =
-    document.getElementById("countLandslide");
-
-  if (floodCount) {
-    floodCount.textContent = (
-      DB.flood?.length || 0
-    ).toLocaleString();
-  }
-
-  if (earthquakeCount) {
-    earthquakeCount.textContent = (
-      DB.earthquake?.length || 0
-    ).toLocaleString();
-  }
-
-  if (landslideCount) {
-    landslideCount.textContent = (
-      DB.landslide?.length || 0
-    ).toLocaleString();
-  }
-
-  const badge =
-    document.getElementById("liveBadge");
-
-  if (!badge) return;
-
-  const liveParts = [];
-
-  if (
-    typeof usgsLoaded !== "undefined" &&
-    usgsLoaded
-  ) {
-    liveParts.push(
-      `${(
-        DB.earthquake?.length || 0
-      ).toLocaleString()} USGS earthquakes`,
-    );
-  }
-
-  if (
-    typeof gdacsLoaded !== "undefined" &&
-    gdacsLoaded
-  ) {
-    liveParts.push("GDACS");
-  }
-
-  if (liveParts.length) {
-    badge.textContent =
-      `● LIVE DATA · ${liveParts.join(
-        " · ",
-      )} · 2020–2026`;
-  } else {
-    badge.textContent =
-      "● LIVE DATA · BIPAD / USGS / GDACS";
-  }
-}
-
-
-/* ================================================================
-   HOMEPAGE NEWS
-   ================================================================ */
-
-function renderHomeNews() {
-  const section =
-    document.getElementById("homeNewsSection");
-
-  const track =
-    document.getElementById("homeNewsTrack");
-
-  if (!section || !track) return;
-
-  const allNews = [];
-
-  [
-    "flood",
-    "earthquake",
-    "landslide",
-  ].forEach((type) => {
-    const articles =
-      MEDIA?.[type]?.news || [];
-
-    articles.forEach((article) => {
-      if (!article) return;
-
-      allNews.push({
-        ...article,
-        disasterType:
-          article.disasterType || type,
-      });
-    });
-  });
-
-  const seen = new Set();
-
-  const news = allNews
-    .filter((article) => {
-      const title = String(
-        article.title || "",
-      )
-        .trim()
-        .toLowerCase();
-
-      const url = String(
-        article.url || "",
-      )
-        .trim()
-        .toLowerCase();
-
-      const source = String(
-        article.source ||
-          article.domain ||
-          "",
-      )
-        .trim()
-        .toLowerCase();
-
-      const key =
-        url ||
-        `${title}|${source}|${getArticleDate(
-          article,
-        )}`;
-
-      if (!key || seen.has(key)) {
-        return false;
-      }
-
-      seen.add(key);
-      return true;
-    })
-    .sort(
-      (a, b) =>
-        getArticleDate(b) -
-        getArticleDate(a),
-    )
-    .slice(0, 12);
-
-  section.style.display = "block";
-
-  if (!news.length) {
-    track.innerHTML = `
-      <div style="
-        width:100%;
-        padding:20px;
-        border:1px dashed var(--panel-border);
-        font-family:var(--font-mono);
-        font-size:11px;
-        color:var(--text-2);
-        background:rgba(255,255,255,.015);
-      ">
-        <strong style="
-          display:block;
-          color:var(--text-1);
-          margin-bottom:6px;
-        ">
-          NEWS FEED
-        </strong>
-
-        No current articles are available
-        from the configured public news
-        sources.
-
-        <br><br>
-
-        The dashboard will continue checking
-        when the feed refreshes.
-      </div>
-    `;
-
-    return;
-  }
-
-  track.innerHTML = news
-    .map((article, index) => {
-      const meta =
-        TYPE_META[
-          article.disasterType
-        ] ||
-        TYPE_META.earthquake;
-
-      const image =
-        typeof getCardImage === "function"
-          ? safeImageURL(
-              getCardImage(article, index),
-              `home-${index}`,
-            )
-          : imageFallbackHTML(
-              `home-${index}`,
-            );
-
-      const title =
-        article.title ||
-        "Nepal disaster news";
-
-      const source =
-        article.source ||
-        article.domain ||
-        "NEWS";
-
-      const date =
-        article.date ||
-        article.publishedAt ||
-        article.pubDate;
-
-      return `
-        <article
-          class="home-news-card"
-          data-news-index="${index}"
-          style="
-            border-top:2px solid ${meta.color};
-            cursor:pointer;
-          "
-        >
-          <div style="
-            position:relative;
-            overflow:hidden;
-            aspect-ratio:16/9;
-            background:var(--bg-2);
-          ">
-            <img
-              src="${escapeHTML(image)}"
-              alt="${escapeHTML(title)}"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-              style="
-                width:100%;
-                height:100%;
-                object-fit:cover;
-                display:block;
-              "
-            >
-
-            <span style="
-              position:absolute;
-              top:8px;
-              left:8px;
-              padding:4px 7px;
-              background:rgba(0,0,0,.78);
-              border:1px solid ${meta.color};
-              color:${meta.color};
-              font:600 9px var(--font-mono);
-              letter-spacing:.08em;
-            ">
-              ${escapeHTML(meta.tag)}
-            </span>
-          </div>
-
-          <div style="padding:12px;">
-            <div style="
-              font:600 10px var(--font-mono);
-              color:var(--text-2);
-              margin-bottom:7px;
-              white-space:nowrap;
-              overflow:hidden;
-              text-overflow:ellipsis;
-            ">
-              ${escapeHTML(source)}
-              ${
-                date
-                  ? ` · ${formatDate(date)}`
-                  : ""
-              }
-            </div>
-
-            <div style="
-              font:700 17px var(--font-display);
-              line-height:1.12;
-              color:var(--text-0);
-            ">
-              ${escapeHTML(title)}
-            </div>
-          </div>
-        </article>
-      `;
-    })
-    .join("");
-
-  track
-    .querySelectorAll(".home-news-card")
-    .forEach((card) => {
-      card.onclick = () => {
-        const index = Number(
-          card.dataset.newsIndex,
-        );
-
-        const article = news[index];
-
-        if (article?.url) {
-          window.open(
-            article.url,
-            "_blank",
-            "noopener,noreferrer",
-          );
-        }
-      };
-    });
-
-  track
-    .querySelectorAll("img")
-    .forEach((img, index) => {
-      img.onerror = () => {
-        if (
-          img.dataset.fallback === "1"
-        ) {
-          return;
-        }
-
-        img.dataset.fallback = "1";
-
-        img.src =
-          imageFallbackHTML(
-            `home-news-${index}`,
-          );
-      };
-    });
-}
-
-
-/* ================================================================
-   YEAR RAIL
-   ================================================================ */
-
-function renderYearRail() {
-  const rail =
-    document.getElementById("yearRail");
-
-  if (!rail) return;
-
-  const meta =
-    TYPE_META[state.disaster];
-
-  if (!meta) return;
-
-  rail.innerHTML = "";
-
-  const allChip =
-    document.createElement("div");
-
-  allChip.className =
-    "year-chip" +
-    (state.year === "all"
-      ? " active"
-      : "");
-
-  allChip.style.setProperty(
-    "--accent",
-    meta.color,
-  );
-
-  allChip.innerHTML = `
-    <span class="y">ALL</span>
-    <span class="c">
-      ${
-        (
-          DB[state.disaster] || []
-        ).length
-      .toLocaleString()}
-      total
-    </span>
-  `;
-
-  allChip.onclick = () => {
-    state.year = "all";
-    state.visibleCount = 150;
-
-    renderYearRail();
-    renderStats();
-    renderGrid();
-    renderTimeline();
-    renderMap();
-  };
-
-  rail.appendChild(allChip);
-
-  YEARS.slice()
-    .reverse()
-    .forEach((y) => {
-      const count =
-        (
-          DB[state.disaster] || []
-        ).filter(
-          (d) => d.year === y,
-        ).length;
-
-      const chip =
-        document.createElement("div");
-
-      chip.className =
-        "year-chip" +
-        (state.year === y
-          ? " active"
-          : "");
-
-      chip.style.setProperty(
-        "--accent",
-        meta.color,
-      );
-
-      chip.innerHTML = `
-        <span class="y">${y}</span>
-        <span class="c">
-          ${count.toLocaleString()}
-          incidents
-        </span>
-      `;
-
-      chip.onclick = () => {
-        state.year = y;
-        state.visibleCount = 150;
-
-        renderYearRail();
-        renderStats();
-        renderGrid();
-        renderTimeline();
-        renderMap();
-      };
-
-      rail.appendChild(chip);
-    });
-}
-
-
-/* ================================================================
-   ANIMATED NUMBERS
-   ================================================================ */
-
-function animateNum(el, target) {
-  if (!el) return;
-
-  const dur = 900;
-  const start = performance.now();
-
-  function step(now) {
-    const p = Math.min(
-      1,
-      (now - start) / dur,
-    );
-
-    el.textContent =
-      Math.floor(
-        p * target,
-      ).toLocaleString();
-
-    if (p < 1) {
-      requestAnimationFrame(step);
-    } else {
-      el.textContent =
-        target.toLocaleString();
-    }
-  }
-
-  requestAnimationFrame(step);
-}
-
-
-/* ================================================================
-   STATS
-   ================================================================ */
-
-function renderStats() {
-  const bar =
-    document.getElementById("statsBar");
-
-  if (!bar) return;
 
   let incidents =
     DB[state.disaster] || [];
@@ -735,17 +181,727 @@ function renderStats() {
       );
   }
 
+  let tiles =
+    expandTiles(incidents);
+
+  if (
+    state.province === "all" &&
+    state.district === "all" &&
+    state.severity === "all"
+  ) {
+    tiles =
+      tiles.concat(
+        mediaTilesFor(
+          state.disaster,
+          state.year,
+        ),
+      );
+  }
+
+  if (state.contentType !== "all") {
+    tiles =
+      tiles.filter(
+        (t) =>
+          t.contentType ===
+          state.contentType,
+      );
+  }
+
+  const query =
+    state.search
+      .trim()
+      .toLowerCase();
+
+  if (query) {
+    tiles =
+      tiles.filter((t) => {
+        const fields = [
+          t.id,
+          t.district,
+          t.province,
+          t.title,
+          t.year,
+          t.disasterType,
+          t.municipality,
+          t.contentType,
+          t.description,
+          t.mediaData?.source,
+          t.mediaData?.domain,
+          t.mediaData?.channel,
+          t.mediaData?.artist,
+        ];
+
+        return fields.some(
+          (field) =>
+            String(field ?? "")
+              .toLowerCase()
+              .includes(query),
+        );
+      });
+  }
+
+  return tiles;
+}
+
+
+/* ================================================================
+   HERO COUNTS
+   ================================================================ */
+
+function updateHeroCounts() {
+  const floodCount =
+    document.getElementById(
+      "countFlood",
+    );
+
+  const earthquakeCount =
+    document.getElementById(
+      "countEarthquake",
+    );
+
+  const landslideCount =
+    document.getElementById(
+      "countLandslide",
+    );
+
+  if (floodCount) {
+    floodCount.textContent =
+      (
+        DB.flood?.length || 0
+      ).toLocaleString();
+  }
+
+  if (earthquakeCount) {
+    earthquakeCount.textContent =
+      (
+        DB.earthquake?.length || 0
+      ).toLocaleString();
+  }
+
+  if (landslideCount) {
+    landslideCount.textContent =
+      (
+        DB.landslide?.length || 0
+      ).toLocaleString();
+  }
+
+  const badge =
+    document.getElementById(
+      "liveBadge",
+    );
+
+  if (!badge) {
+    return;
+  }
+
+  const liveParts = [];
+
+  if (
+    typeof usgsLoaded !==
+      "undefined" &&
+    usgsLoaded
+  ) {
+    liveParts.push(
+      `${(
+        DB.earthquake?.length ||
+        0
+      ).toLocaleString()} USGS earthquakes`,
+    );
+  }
+
+  if (
+    typeof gdacsLoaded !==
+      "undefined" &&
+    gdacsLoaded
+  ) {
+    liveParts.push(
+      "GDACS",
+    );
+  }
+
+  if (liveParts.length) {
+    badge.textContent =
+      `● LIVE DATA · ${liveParts.join(
+        " · ",
+      )} · 2020–2026`;
+  } else {
+    badge.textContent =
+      "● LIVE DATA · BIPAD / USGS / GDACS";
+  }
+}
+
+
+/* ================================================================
+   HOMEPAGE NEWS
+   ================================================================ */
+
+function renderHomeNews() {
+  const section =
+    document.getElementById(
+      "homeNewsSection",
+    );
+
+  const track =
+    document.getElementById(
+      "homeNewsTrack",
+    );
+
+  if (!section || !track) {
+    return;
+  }
+
+  const allNews = [];
+
+  [
+    "flood",
+    "earthquake",
+    "landslide",
+  ].forEach((type) => {
+    const articles =
+      MEDIA?.[type]?.news || [];
+
+    articles.forEach(
+      (article) => {
+        if (!article) {
+          return;
+        }
+
+        allNews.push({
+          ...article,
+          disasterType:
+            article.disasterType ||
+            type,
+        });
+      },
+    );
+  });
+
+  const seen =
+    new Set();
+
+  const news =
+    allNews
+      .filter((article) => {
+        const title =
+          String(
+            article.title || "",
+          )
+            .trim()
+            .toLowerCase();
+
+        const url =
+          String(
+            article.url || "",
+          )
+            .trim()
+            .toLowerCase();
+
+        const source =
+          String(
+            article.source ||
+              article.domain ||
+              "",
+          )
+            .trim()
+            .toLowerCase();
+
+        const key =
+          url ||
+          `${title}|${source}|${getArticleDate(
+            article,
+          )}`;
+
+        if (
+          !key ||
+          seen.has(key)
+        ) {
+          return false;
+        }
+
+        seen.add(key);
+
+        return true;
+      })
+      .sort(
+        (a, b) =>
+          getArticleDate(b) -
+          getArticleDate(a),
+      )
+      .slice(0, 12);
+
+  section.style.display =
+    "block";
+
+  if (!news.length) {
+    track.innerHTML = `
+      <div style="
+        width:100%;
+        padding:20px;
+        border:1px dashed var(--panel-border);
+        font-family:var(--font-mono);
+        font-size:11px;
+        color:var(--text-2);
+        background:rgba(255,255,255,.015);
+      ">
+        <strong style="
+          display:block;
+          color:var(--text-1);
+          margin-bottom:6px;
+        ">
+          NEWS FEED
+        </strong>
+
+        No current articles are available
+        from the configured public news
+        sources.
+
+        <br><br>
+
+        The dashboard will continue checking
+        when the feed refreshes.
+      </div>
+    `;
+
+    return;
+  }
+
+  track.innerHTML =
+    news
+      .map(
+        (article, index) => {
+          const meta =
+            TYPE_META[
+              article.disasterType
+            ] ||
+            TYPE_META.earthquake;
+
+          const image =
+            typeof getCardImage ===
+            "function"
+              ? safeImageURL(
+                  getCardImage(
+                    article,
+                    index,
+                  ),
+                  `home-${index}`,
+                )
+              : imageFallbackHTML(
+                  `home-${index}`,
+                );
+
+          const title =
+            article.title ||
+            "Nepal disaster news";
+
+          const source =
+            article.source ||
+            article.domain ||
+            "NEWS";
+
+          const date =
+            article.date ||
+            article.publishedAt ||
+            article.pubDate;
+
+          return `
+            <article
+              class="home-news-card"
+              data-news-index="${index}"
+              style="
+                border-top:2px solid ${meta.color};
+                cursor:pointer;
+              "
+            >
+              <div style="
+                position:relative;
+                overflow:hidden;
+                aspect-ratio:16/9;
+                background:var(--bg-2);
+              ">
+                <img
+                  src="${escapeHTML(
+                    image,
+                  )}"
+                  alt="${escapeHTML(
+                    title,
+                  )}"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    display:block;
+                  "
+                >
+
+                <span style="
+                  position:absolute;
+                  top:8px;
+                  left:8px;
+                  padding:4px 7px;
+                  background:rgba(0,0,0,.78);
+                  border:1px solid ${meta.color};
+                  color:${meta.color};
+                  font:600 9px var(--font-mono);
+                  letter-spacing:.08em;
+                ">
+                  ${escapeHTML(
+                    meta.tag,
+                  )}
+                </span>
+              </div>
+
+              <div style="padding:12px;">
+                <div style="
+                  font:600 10px var(--font-mono);
+                  color:var(--text-2);
+                  margin-bottom:7px;
+                  white-space:nowrap;
+                  overflow:hidden;
+                  text-overflow:ellipsis;
+                ">
+                  ${escapeHTML(
+                    source,
+                  )}
+                  ${
+                    date
+                      ? ` · ${formatDate(
+                          date,
+                        )}`
+                      : ""
+                  }
+                </div>
+
+                <div style="
+                  font:700 17px var(--font-display);
+                  line-height:1.12;
+                  color:var(--text-0);
+                ">
+                  ${escapeHTML(
+                    title,
+                  )}
+                </div>
+              </div>
+            </article>
+          `;
+        },
+      )
+      .join("");
+
+  track
+    .querySelectorAll(
+      ".home-news-card",
+    )
+    .forEach((card) => {
+      card.onclick = () => {
+        const index =
+          Number(
+            card.dataset.newsIndex,
+          );
+
+        const article =
+          news[index];
+
+        if (article?.url) {
+          window.open(
+            article.url,
+            "_blank",
+            "noopener,noreferrer",
+          );
+        }
+      };
+    });
+
+  track
+    .querySelectorAll("img")
+    .forEach(
+      (img, index) => {
+        img.onerror = () => {
+          if (
+            img.dataset.fallback ===
+            "1"
+          ) {
+            return;
+          }
+
+          img.dataset.fallback =
+            "1";
+
+          img.src =
+            imageFallbackHTML(
+              `home-news-${index}`,
+            );
+        };
+      },
+    );
+}
+
+
+/* ================================================================
+   YEAR RAIL
+   ================================================================ */
+
+function renderYearRail() {
+  const rail =
+    document.getElementById(
+      "yearRail",
+    );
+
+  if (!rail) {
+    return;
+  }
+
+  const meta =
+    TYPE_META[
+      state.disaster
+    ];
+
+  if (!meta) {
+    return;
+  }
+
+  rail.innerHTML =
+    "";
+
+  const allChip =
+    document.createElement(
+      "div",
+    );
+
+  allChip.className =
+    "year-chip" +
+    (
+      state.year === "all"
+        ? " active"
+        : ""
+    );
+
+  allChip.style.setProperty(
+    "--accent",
+    meta.color,
+  );
+
+  allChip.innerHTML = `
+    <span class="y">ALL</span>
+    <span class="c">
+      ${
+        (
+          DB[state.disaster] ||
+          []
+        ).length
+      .toLocaleString()}
+      total
+    </span>
+  `;
+
+  allChip.onclick = () => {
+    state.year =
+      "all";
+
+    state.visibleCount =
+      150;
+
+    renderYearRail();
+    renderStats();
+    renderGrid();
+    renderTimeline();
+
+    if (
+      state.view === "map"
+    ) {
+      renderMap();
+    }
+  };
+
+  rail.appendChild(
+    allChip,
+  );
+
+  YEARS.slice()
+    .reverse()
+    .forEach((y) => {
+      const count =
+        (
+          DB[state.disaster] ||
+          []
+        ).filter(
+          (d) =>
+            d.year === y,
+        ).length;
+
+      const chip =
+        document.createElement(
+          "div",
+        );
+
+      chip.className =
+        "year-chip" +
+        (
+          state.year === y
+            ? " active"
+            : ""
+        );
+
+      chip.style.setProperty(
+        "--accent",
+        meta.color,
+      );
+
+      chip.innerHTML = `
+        <span class="y">${y}</span>
+
+        <span class="c">
+          ${count.toLocaleString()}
+          incidents
+        </span>
+      `;
+
+      chip.onclick = () => {
+        state.year =
+          y;
+
+        state.visibleCount =
+          150;
+
+        renderYearRail();
+        renderStats();
+        renderGrid();
+        renderTimeline();
+
+        if (
+          state.view ===
+          "map"
+        ) {
+          renderMap();
+        }
+      };
+
+      rail.appendChild(
+        chip,
+      );
+    });
+}
+
+
+/* ================================================================
+   ANIMATED NUMBERS
+   ================================================================ */
+
+function animateNum(
+  el,
+  target,
+) {
+  if (!el) {
+    return;
+  }
+
+  const dur =
+    900;
+
+  const start =
+    performance.now();
+
+  function step(now) {
+    const p =
+      Math.min(
+        1,
+        (now - start) /
+          dur,
+      );
+
+    el.textContent =
+      Math.floor(
+        p * target,
+      ).toLocaleString();
+
+    if (p < 1) {
+      requestAnimationFrame(
+        step,
+      );
+    } else {
+      el.textContent =
+        target.toLocaleString();
+    }
+  }
+
+  requestAnimationFrame(
+    step,
+  );
+}
+
+
+/* ================================================================
+   STATS
+   ================================================================ */
+
+function renderStats() {
+  const bar =
+    document.getElementById(
+      "statsBar",
+    );
+
+  if (!bar) {
+    return;
+  }
+
+  let incidents =
+    DB[state.disaster] ||
+    [];
+
+  if (state.year !== "all") {
+    incidents =
+      incidents.filter(
+        (d) =>
+          d.year ===
+          state.year,
+      );
+  }
+
+  if (state.province !== "all") {
+    incidents =
+      incidents.filter(
+        (d) =>
+          d.province ===
+          state.province,
+      );
+  }
+
+  if (state.district !== "all") {
+    incidents =
+      incidents.filter(
+        (d) =>
+          d.district ===
+          state.district,
+      );
+  }
+
+  if (state.severity !== "all") {
+    incidents =
+      incidents.filter(
+        (d) =>
+          d.severity ===
+          state.severity,
+      );
+  }
+
   const districts =
     new Set(
       incidents
-        .map((d) => d.district)
+        .map(
+          (d) =>
+            d.district,
+        )
         .filter(Boolean),
     ).size;
 
   const provinces =
     new Set(
       incidents
-        .map((d) => d.province)
+        .map(
+          (d) =>
+            d.province,
+        )
         .filter(Boolean),
     ).size;
 
@@ -758,86 +914,130 @@ function renderStats() {
   const images =
     media.filter(
       (m) =>
-        m.contentType === "image",
+        m.contentType ===
+        "image",
     ).length +
     incidents.reduce(
       (a, d) =>
         a +
-        (d.demo
-          ? d.imageCount || 0
-          : 0),
+        (
+          d.demo
+            ? d.imageCount ||
+              0
+            : 0
+        ),
       0,
     );
 
   const videos =
     media.filter(
       (m) =>
-        m.contentType === "video",
+        m.contentType ===
+        "video",
     ).length +
     incidents.reduce(
       (a, d) =>
         a +
-        (d.demo
-          ? d.videoCount || 0
-          : 0),
+        (
+          d.demo
+            ? d.videoCount ||
+              0
+            : 0
+        ),
       0,
     );
 
   const news =
     media.filter(
       (m) =>
-        m.contentType === "news",
+        m.contentType ===
+        "news",
     ).length +
     incidents.reduce(
       (a, d) =>
         a +
-        (d.demo
-          ? d.newsCount || 0
-          : 0),
+        (
+          d.demo
+            ? d.newsCount ||
+              0
+            : 0
+        ),
       0,
     );
 
   const live =
     incidents.filter(
-      (d) => !d.demo,
+      (d) =>
+        !d.demo,
     ).length;
 
   const cells = [
-    ["Incidents", incidents.length],
-    ["Districts", districts],
-    ["Images", images],
-    ["Videos", videos],
-    ["News Reports", news],
-    ["Provinces", provinces],
-    ["Live Records", live],
+    [
+      "Incidents",
+      incidents.length,
+    ],
+    [
+      "Districts",
+      districts,
+    ],
+    [
+      "Images",
+      images,
+    ],
+    [
+      "Videos",
+      videos,
+    ],
+    [
+      "News Reports",
+      news,
+    ],
+    [
+      "Provinces",
+      provinces,
+    ],
+    [
+      "Live Records",
+      live,
+    ],
   ];
 
-  bar.innerHTML = cells
-    .map(
-      ([label, num]) => `
-        <div class="stat-cell">
-          <div
-            class="stat-num"
-            data-target="${num}"
-          >
-            0
-          </div>
+  bar.innerHTML =
+    cells
+      .map(
+        ([label, num]) => `
+          <div class="stat-cell">
 
-          <div class="stat-label">
-            ${escapeHTML(label)}
+            <div
+              class="stat-num"
+              data-target="${num}"
+            >
+              0
+            </div>
+
+            <div class="stat-label">
+              ${escapeHTML(
+                label,
+              )}
+            </div>
+
           </div>
-        </div>
-      `,
-    )
-    .join("");
+        `,
+      )
+      .join("");
 
   bar
-    .querySelectorAll(".stat-num")
-    .forEach((el) =>
-      animateNum(
-        el,
-        Number(el.dataset.target),
-      ),
+    .querySelectorAll(
+      ".stat-num",
+    )
+    .forEach(
+      (el) =>
+        animateNum(
+          el,
+          Number(
+            el.dataset.target,
+          ),
+        ),
     );
 }
 
@@ -852,7 +1052,9 @@ function renderProvinceOptions() {
       "provinceSelect",
     );
 
-  if (!sel) return;
+  if (!sel) {
+    return;
+  }
 
   sel.innerHTML =
     `
@@ -860,18 +1062,25 @@ function renderProvinceOptions() {
         All Provinces
       </option>
     ` +
-    Object.keys(PROVINCES || {})
+    Object.keys(
+      PROVINCES || {},
+    )
       .map(
         (p) => `
-          <option value="${escapeHTML(p)}">
-            ${escapeHTML(p)}
+          <option value="${escapeHTML(
+            p,
+          )}">
+            ${escapeHTML(
+              p,
+            )}
           </option>
         `,
       )
       .join("");
 
   sel.value =
-    state.province || "all";
+    state.province ||
+    "all";
 }
 
 
@@ -881,12 +1090,17 @@ function renderDistrictOptions() {
       "districtSelect",
     );
 
-  if (!sel) return;
+  if (!sel) {
+    return;
+  }
 
   const list =
-    state.province === "all"
+    state.province ===
+    "all"
       ? ALL_DISTRICTS
-      : PROVINCES[state.province] || [];
+      : PROVINCES[
+          state.province
+        ] || [];
 
   sel.innerHTML =
     `
@@ -897,19 +1111,27 @@ function renderDistrictOptions() {
     list
       .map(
         (d) => `
-          <option value="${escapeHTML(d)}">
-            ${escapeHTML(d)}
+          <option value="${escapeHTML(
+            d,
+          )}">
+            ${escapeHTML(
+              d,
+            )}
           </option>
         `,
       )
       .join("");
 
   if (
-    list.includes(state.district)
+    list.includes(
+      state.district,
+    )
   ) {
-    sel.value = state.district;
+    sel.value =
+      state.district;
   } else {
-    sel.value = "all";
+    sel.value =
+      "all";
   }
 }
 
@@ -919,14 +1141,17 @@ function renderDistrictOptions() {
    ================================================================ */
 
 function renderGrid() {
-  const tiles = getFilteredTiles();
+  const tiles =
+    getFilteredTiles();
 
   const grid =
     document.getElementById(
       "tileGrid",
     );
 
-  if (!grid) return;
+  if (!grid) {
+    return;
+  }
 
   const shown =
     tiles.slice(
@@ -983,202 +1208,254 @@ function renderGrid() {
       );
 
     if (loadMore) {
-      loadMore.style.display = "none";
+      loadMore.style.display =
+        "none";
     }
 
     return;
   }
 
-  grid.innerHTML = shown
-    .map((t, index) => {
-      const meta =
-        TYPE_META[t.disasterType] ||
-        TYPE_META.earthquake;
+  grid.innerHTML =
+    shown
+      .map((t, index) => {
+        const meta =
+          TYPE_META[
+            t.disasterType
+          ] ||
+          TYPE_META.earthquake;
 
-      const typeIcon = {
-        incident: "📍",
-        image: "📷",
-        news: "📰",
-        video: "▶",
-      }[t.contentType] || "•";
+        const typeIcon = {
+          incident: "📍",
+          image: "📷",
+          news: "📰",
+          video: "▶",
+        }[
+          t.contentType
+        ] || "•";
 
-      const image =
-        safeImageURL(
-          t.tileImg,
-          `${t.id}-${index}`,
-        );
+        const image =
+          safeImageURL(
+            t.tileImg,
+            `${t.id}-${index}`,
+          );
 
-      const source =
-        t.isMedia
-          ? getMediaSource(t)
-          : t.demo
-            ? "Demonstration record"
-            : t.verified
-              ? "BIPAD · Verified"
-              : t.usgsUrl
-                ? "USGS Earthquake Catalog"
-                : t.gdacsUrl
-                  ? "GDACS"
-                  : "BIPAD";
+        const source =
+          t.isMedia
+            ? getMediaSource(
+                t,
+              )
+            : t.demo
+              ? "Demonstration record"
+              : t.verified
+                ? "BIPAD · Verified"
+                : t.usgsUrl
+                  ? "USGS Earthquake Catalog"
+                  : t.gdacsUrl
+                    ? "GDACS"
+                    : "BIPAD";
 
-      return `
-        <div
-          class="tile"
-          data-id="${escapeHTML(t.id)}"
-          data-ct="${escapeHTML(
-            t.contentType,
-          )}"
-          data-media="${
-            t.isMedia ? "1" : "0"
-          }"
-          tabindex="0"
-          role="button"
-          aria-label="${escapeHTML(
-            t.title ||
-              "Disaster record",
-          )}"
-        >
-          <span
-            class="type-dot"
-            style="
-              background:${meta.color};
-              color:${meta.color};
-            "
-          ></span>
-
-          ${
-            t.demo
-              ? `
-                <span class="demo-tag">
-                  DEMO
-                </span>
-              `
-              : `
-                <span
-                  class="demo-tag"
-                  style="color:#39d97a"
-                >
-                  LIVE
-                </span>
-              `
-          }
-
-          <img
-            loading="lazy"
-            src="${escapeHTML(image)}"
-            alt="${escapeHTML(
-              t.title ||
-                "Nepal disaster",
+        return `
+          <div
+            class="tile"
+            data-id="${escapeHTML(
+              t.id,
             )}"
-            referrerpolicy="no-referrer"
+            data-ct="${escapeHTML(
+              t.contentType,
+            )}"
+            data-media="${
+              t.isMedia
+                ? "1"
+                : "0"
+            }"
+            tabindex="0"
+            role="button"
+            aria-label="${escapeHTML(
+              t.title ||
+                "Disaster record",
+            )}"
           >
 
-          <div class="tile-overlay">
-            <div class="tile-loc">
-              ${typeIcon}
-              ${escapeHTML(
-                t.district ||
+            <span
+              class="type-dot"
+              style="
+                background:${meta.color};
+                color:${meta.color};
+              "
+            ></span>
+
+            ${
+              t.demo
+                ? `
+                  <span class="demo-tag">
+                    DEMO
+                  </span>
+                `
+                : `
+                  <span
+                    class="demo-tag"
+                    style="
+                      color:#39d97a
+                    "
+                  >
+                    LIVE
+                  </span>
+                `
+            }
+
+            <img
+              loading="lazy"
+              src="${escapeHTML(
+                image,
+              )}"
+              alt="${escapeHTML(
+                t.title ||
+                  "Nepal disaster",
+              )}"
+              referrerpolicy="no-referrer"
+            >
+
+            <div class="tile-overlay">
+
+              <div class="tile-loc">
+                ${typeIcon}
+
+                ${escapeHTML(
+                  t.district ||
+                    source,
+                )}
+              </div>
+
+              <div class="tile-date">
+                ${
+                  t.date
+                    ? formatDate(
+                        t.date,
+                      )
+                    : "Reference"
+                }
+              </div>
+
+              <div style="
+                font-family:var(--font-mono);
+                font-size:9px;
+                opacity:.75;
+                margin-top:3px;
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;
+              ">
+                ${escapeHTML(
                   source,
-              )}
-            </div>
+                )}
+              </div>
 
-            <div class="tile-date">
-              ${
-                t.date
-                  ? formatDate(t.date)
-                  : "Reference"
-              }
-            </div>
+              <div class="tile-view">
+                VIEW →
+              </div>
 
-            <div style="
-              font-family:var(--font-mono);
-              font-size:9px;
-              opacity:.75;
-              margin-top:3px;
-              white-space:nowrap;
-              overflow:hidden;
-              text-overflow:ellipsis;
-            ">
-              ${escapeHTML(source)}
-            </div>
-
-            <div class="tile-view">
-              VIEW →
             </div>
           </div>
-        </div>
-      `;
-    })
-    .join("");
+        `;
+      })
+      .join("");
 
   grid
-    .querySelectorAll(".tile")
+    .querySelectorAll(
+      ".tile",
+    )
     .forEach((el) => {
       const image =
-        el.querySelector("img");
+        el.querySelector(
+          "img",
+        );
 
       if (image) {
-        image.onerror = () => {
+        image.onerror =
+          () => {
+            if (
+              image.dataset
+                .fallback ===
+              "1"
+            ) {
+              return;
+            }
+
+            image.dataset.fallback =
+              "1";
+
+            image.src =
+              imageFallbackHTML(
+                el.dataset.id,
+              );
+          };
+      }
+
+      const open =
+        () => {
+          const id =
+            el.dataset.id;
+
           if (
-            image.dataset.fallback === "1"
+            el.dataset.media ===
+            "1"
           ) {
+            const allMedia =
+              mediaTilesFor(
+                state.disaster,
+                "all",
+              );
+
+            const item =
+              allMedia.find(
+                (m) =>
+                  m.id ===
+                  id,
+              );
+
+            if (item) {
+              openMediaModal(
+                item,
+              );
+            }
+
             return;
           }
 
-          image.dataset.fallback = "1";
-
-          image.src =
-            imageFallbackHTML(
-              el.dataset.id,
-            );
-        };
-      }
-
-      const open = () => {
-        const id = el.dataset.id;
-
-        if (el.dataset.media === "1") {
-          const allMedia =
-            mediaTilesFor(
-              state.disaster,
-              "all",
+          const inc =
+            (
+              DB[
+                state.disaster
+              ] || []
+            ).find(
+              (d) =>
+                d.id ===
+                id,
             );
 
-          const item =
-            allMedia.find(
-              (m) => m.id === id,
+          if (inc) {
+            openModal(
+              inc,
             );
-
-          if (item) {
-            openMediaModal(item);
           }
+        };
 
-          return;
-        }
+      el.onclick =
+        open;
 
-        const inc =
-          (
-            DB[state.disaster] || []
-          ).find(
-            (d) => d.id === id,
-          );
+      el.onkeydown =
+        (e) => {
+          if (
+            e.key ===
+              "Enter" ||
+            e.key ===
+              " "
+          ) {
+            e.preventDefault();
 
-        if (inc) {
-          openModal(inc);
-        }
-      };
-
-      el.onclick = open;
-
-      el.onkeydown = (e) => {
-        if (
-          e.key === "Enter" ||
-          e.key === " "
-        ) {
-          e.preventDefault();
-          open();
-        }
-      };
+            open();
+          }
+        };
     });
 
   const loadMore =
@@ -1200,18 +1477,24 @@ function renderGrid() {
    MAP
    ================================================================ */
 
-let mainLeafletMap = null;
-let mainMarkersLayer = null;
+let mainLeafletMap =
+  null;
+
+let mainMarkersLayer =
+  null;
 
 
 function renderMap() {
   let incidents =
-    DB[state.disaster] || [];
+    DB[state.disaster] ||
+    [];
 
   if (state.year !== "all") {
     incidents =
       incidents.filter(
-        (d) => d.year === state.year,
+        (d) =>
+          d.year ===
+          state.year,
       );
   }
 
@@ -1219,7 +1502,8 @@ function renderMap() {
     incidents =
       incidents.filter(
         (d) =>
-          d.province === state.province,
+          d.province ===
+          state.province,
       );
   }
 
@@ -1227,7 +1511,8 @@ function renderMap() {
     incidents =
       incidents.filter(
         (d) =>
-          d.district === state.district,
+          d.district ===
+          state.district,
       );
   }
 
@@ -1235,16 +1520,28 @@ function renderMap() {
     incidents =
       incidents.filter(
         (d) =>
-          d.severity === state.severity,
+          d.severity ===
+          state.severity,
       );
   }
 
   const meta =
-    TYPE_META[state.disaster];
+    TYPE_META[
+      state.disaster
+    ];
 
-  if (!meta) return;
+  if (!meta) {
+    return;
+  }
 
-  if (typeof window.L === "undefined") {
+  if (
+    typeof window.L ===
+    "undefined"
+  ) {
+    console.warn(
+      "Leaflet is not loaded.",
+    );
+
     return;
   }
 
@@ -1253,219 +1550,282 @@ function renderMap() {
       "leafletMap",
     );
 
-  if (!mapElement) return;
-
-  if (!mainLeafletMap) {
-    mainLeafletMap =
-      L.map(
-        "leafletMap",
-        {
-          preferCanvas: true,
-        },
-      ).setView(
-        [28.3949, 84.124],
-        7,
-      );
-
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 18,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
-      },
-    ).addTo(
-      mainLeafletMap,
-    );
-
-    mainMarkersLayer =
-      L.layerGroup().addTo(
-        mainLeafletMap,
-      );
-  } else {
-    setTimeout(
-      () =>
-        mainLeafletMap.invalidateSize(),
-      60,
-    );
+  if (!mapElement) {
+    return;
   }
 
-  mainMarkersLayer.clearLayers();
-
-  const colorVar =
-    state.disaster === "flood"
-      ? "--flood"
-      : state.disaster === "earthquake"
-        ? "--quake"
-        : "--slide";
-
-  const color =
-    getComputedStyle(
-      document.documentElement,
-    )
-      .getPropertyValue(colorVar)
-      .trim() ||
-    meta.color;
-
-  const CAP = 500;
-
-  const shown =
-    incidents.slice(0, CAP);
-
-  shown.forEach((inc) => {
+  try {
     if (
-      typeof inc.lat !== "number" ||
-      typeof inc.lng !== "number"
+      !mainLeafletMap
     ) {
-      return;
-    }
+      mainLeafletMap =
+        L.map(
+          "leafletMap",
+          {
+            preferCanvas:
+              true,
+          },
+        ).setView(
+          [
+            28.3949,
+            84.124,
+          ],
+          7,
+        );
 
-    const marker =
-      L.circleMarker(
-        [inc.lat, inc.lng],
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-          radius: 6,
-          color,
-          weight: 1.5,
-          fillColor: color,
-          fillOpacity: 0.55,
+          maxZoom: 18,
+
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
         },
+      ).addTo(
+        mainLeafletMap,
       );
 
-    const verifiedLine =
-      inc.verified !== undefined
-        ? inc.verified
-          ? " · ✓ Verified"
-          : " · Unverified"
-        : inc.mag
-          ? ` · M${(+inc.mag).toFixed(1)}`
-          : "";
+      mainMarkersLayer =
+        L.layerGroup().addTo(
+          mainLeafletMap,
+        );
+    } else {
+      setTimeout(
+        () =>
+          mainLeafletMap.invalidateSize(),
+        60,
+      );
+    }
 
-    const status =
-      inc.demo ? "DEMO" : "LIVE";
+    if (
+      !mainMarkersLayer
+    ) {
+      mainMarkersLayer =
+        L.layerGroup().addTo(
+          mainLeafletMap,
+        );
+    }
 
-    marker.bindPopup(`
-      <div style="
-        min-width:190px;
-        font-family:Inter,sans-serif;
-      ">
-        <div style="
-          font:600 9px monospace;
-          letter-spacing:.08em;
-          color:${color};
-          margin-bottom:5px;
-        ">
-          ${status}
-          ·
-          ${escapeHTML(meta.tag)}
-        </div>
+    mainMarkersLayer.clearLayers();
 
-        <strong>
-          ${escapeHTML(
-            inc.title,
-          )}
-        </strong>
+    const colorVar =
+      state.disaster ===
+      "flood"
+        ? "--flood"
+        : state.disaster ===
+            "earthquake"
+          ? "--quake"
+          : "--slide";
 
-        <br>
+    const color =
+      getComputedStyle(
+        document.documentElement,
+      )
+        .getPropertyValue(
+          colorVar,
+        )
+        .trim() ||
+      meta.color;
 
-        ${escapeHTML(
-          inc.district || "Nepal",
-        )},
-        ${escapeHTML(
-          inc.province || "Nepal",
-        )}
+    const CAP =
+      500;
 
-        <br>
+    const shown =
+      incidents.slice(
+        0,
+        CAP,
+      );
 
-        ${formatDate(inc.date)}
+    shown.forEach(
+      (inc) => {
+        if (
+          typeof inc.lat !==
+            "number" ||
+          typeof inc.lng !==
+            "number"
+        ) {
+          return;
+        }
 
-        ${verifiedLine}
-
-        <br><br>
-
-        <a
-          href="#"
-          class="map-detail-link"
-          style="color:${color}"
-        >
-          View full details →
-        </a>
-      </div>
-    `);
-
-    marker.on(
-      "popupopen",
-      (e) => {
-        const popup = e.popup;
-
-        const contentNode =
-          popup?.getElement?.();
-
-        const link =
-          contentNode?.querySelector(
-            ".map-detail-link",
+        const marker =
+          L.circleMarker(
+            [
+              inc.lat,
+              inc.lng,
+            ],
+            {
+              radius: 6,
+              color,
+              weight: 1.5,
+              fillColor:
+                color,
+              fillOpacity:
+                0.55,
+            },
           );
 
-        if (link) {
-          link.onclick = (ev) => {
-            ev.preventDefault();
-            openModal(inc);
-          };
-        }
+        const verifiedLine =
+          inc.verified !==
+          undefined
+            ? inc.verified
+              ? " · ✓ Verified"
+              : " · Unverified"
+            : inc.mag
+              ? ` · M${(
+                  +inc.mag
+                ).toFixed(1)}`
+              : "";
+
+        const status =
+          inc.demo
+            ? "DEMO"
+            : "LIVE";
+
+        marker.bindPopup(`
+          <div style="
+            min-width:190px;
+            font-family:Inter,sans-serif;
+          ">
+            <div style="
+              font:600 9px monospace;
+              letter-spacing:.08em;
+              color:${color};
+              margin-bottom:5px;
+            ">
+              ${status}
+              ·
+              ${escapeHTML(
+                meta.tag,
+              )}
+            </div>
+
+            <strong>
+              ${escapeHTML(
+                inc.title,
+              )}
+            </strong>
+
+            <br>
+
+            ${escapeHTML(
+              inc.district ||
+                "Nepal",
+            )},
+            ${escapeHTML(
+              inc.province ||
+                "Nepal",
+            )}
+
+            <br>
+
+            ${formatDate(
+              inc.date,
+            )}
+
+            ${verifiedLine}
+
+            <br><br>
+
+            <a
+              href="#"
+              class="map-detail-link"
+              style="color:${color}"
+            >
+              View full details →
+            </a>
+          </div>
+        `);
+
+        marker.on(
+          "popupopen",
+          (e) => {
+            const popup =
+              e.popup;
+
+            const contentNode =
+              popup?.getElement?.();
+
+            const link =
+              contentNode?.querySelector(
+                ".map-detail-link",
+              );
+
+            if (link) {
+              link.onclick =
+                (ev) => {
+                  ev.preventDefault();
+
+                  openModal(
+                    inc,
+                  );
+                };
+            }
+          },
+        );
+
+        marker.addTo(
+          mainMarkersLayer,
+        );
       },
     );
 
-    marker.addTo(
-      mainMarkersLayer,
+    const live =
+      incidents.filter(
+        (d) =>
+          !d.demo,
+      ).length;
+
+    const legend =
+      document.getElementById(
+        "mapLegend",
+      );
+
+    if (legend) {
+      legend.innerHTML = `
+        <div style="
+          font-weight:600;
+          color:#fff;
+          margin-bottom:4px;
+        ">
+          ${incidents.length.toLocaleString()}
+          RECORDS
+
+          ${
+            incidents.length >
+            CAP
+              ? ` · SHOWING ${CAP}`
+              : ""
+          }
+        </div>
+
+        <div>
+          <span
+            class="sw"
+            style="
+              background:${meta.color}
+            "
+          ></span>
+
+          ${escapeHTML(
+            meta.label,
+          )}
+
+          · ${live.toLocaleString()}
+          live
+
+          · ${(
+            incidents.length -
+            live
+          ).toLocaleString()}
+          demo
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error(
+      "Map rendering failed",
+      error,
     );
-  });
-
-  const live =
-    incidents.filter(
-      (d) => !d.demo,
-    ).length;
-
-  const legend =
-    document.getElementById(
-      "mapLegend",
-    );
-
-  if (legend) {
-    legend.innerHTML = `
-      <div style="
-        font-weight:600;
-        color:#fff;
-        margin-bottom:4px;
-      ">
-        ${incidents.length.toLocaleString()}
-        RECORDS
-
-        ${
-          incidents.length > CAP
-            ? ` · SHOWING ${CAP}`
-            : ""
-        }
-      </div>
-
-      <div>
-        <span
-          class="sw"
-          style="
-            background:${meta.color}
-          "
-        ></span>
-
-        ${escapeHTML(meta.label)}
-
-        · ${live.toLocaleString()}
-        live
-
-        · ${(
-          incidents.length - live
-        ).toLocaleString()}
-        demo
-      </div>
-    `;
   }
 }
 
@@ -1480,12 +1840,18 @@ function renderTimeline() {
       "timelineRail",
     );
 
-  if (!rail) return;
+  if (!rail) {
+    return;
+  }
 
   const meta =
-    TYPE_META[state.disaster];
+    TYPE_META[
+      state.disaster
+    ];
 
-  if (!meta) return;
+  if (!meta) {
+    return;
+  }
 
   rail.innerHTML =
     YEARS.slice()
@@ -1493,12 +1859,18 @@ function renderTimeline() {
       .map((y) => {
         let incidents =
           (
-            DB[state.disaster] || []
+            DB[
+              state.disaster
+            ] || []
           ).filter(
-            (d) => d.year === y,
+            (d) =>
+              d.year === y,
           );
 
-        if (state.province !== "all") {
+        if (
+          state.province !==
+          "all"
+        ) {
           incidents =
             incidents.filter(
               (d) =>
@@ -1507,7 +1879,10 @@ function renderTimeline() {
             );
         }
 
-        if (state.district !== "all") {
+        if (
+          state.district !==
+          "all"
+        ) {
           incidents =
             incidents.filter(
               (d) =>
@@ -1516,7 +1891,10 @@ function renderTimeline() {
             );
         }
 
-        if (state.severity !== "all") {
+        if (
+          state.severity !==
+          "all"
+        ) {
           incidents =
             incidents.filter(
               (d) =>
@@ -1525,24 +1903,31 @@ function renderTimeline() {
             );
         }
 
-        let top = [...incidents].sort(
-          (a, b) =>
-            (b.mag || 0) -
-              (a.mag || 0) ||
-            0,
-        );
+        let top =
+          [...incidents].sort(
+            (a, b) =>
+              (b.mag || 0) -
+                (a.mag || 0) ||
+              0,
+          );
 
         if (
           state.disaster !==
           "earthquake"
         ) {
-          top = incidents;
+          top =
+            incidents;
         }
 
-        top = top.slice(0, 3);
+        top =
+          top.slice(
+            0,
+            3,
+          );
 
         return `
           <div class="timeline-year">
+
             <div class="ty">
               ${y}
               ·
@@ -1561,6 +1946,7 @@ function renderTimeline() {
                             t.id,
                           )}"
                         >
+
                           <span
                             class="dot"
                             style="
@@ -1577,7 +1963,9 @@ function renderTimeline() {
                             t.mag
                               ? ` — M${(
                                   +t.mag
-                                ).toFixed(1)}`
+                                ).toFixed(
+                                  1,
+                                )}`
                               : ""
                           }
 
@@ -1586,6 +1974,7 @@ function renderTimeline() {
                               ? " · DEMO"
                               : ""
                           }
+
                         </div>
                       `,
                     )
@@ -1593,12 +1982,15 @@ function renderTimeline() {
                 : `
                     <div
                       class="tev"
-                      style="opacity:.4"
+                      style="
+                        opacity:.4
+                      "
                     >
                       No records
                     </div>
                   `
             }
+
           </div>
         `;
       })
@@ -1609,20 +2001,25 @@ function renderTimeline() {
       ".tev[data-id]",
     )
     .forEach((el) => {
-      el.onclick = () => {
-        const inc =
-          (
-            DB[state.disaster] || []
-          ).find(
-            (d) =>
-              d.id ===
-              el.dataset.id,
-          );
+      el.onclick =
+        () => {
+          const inc =
+            (
+              DB[
+                state.disaster
+              ] || []
+            ).find(
+              (d) =>
+                d.id ===
+                el.dataset.id,
+            );
 
-        if (inc) {
-          openModal(inc);
-        }
-      };
+          if (inc) {
+            openModal(
+              inc,
+            );
+          }
+        };
     });
 }
 
@@ -1631,8 +2028,12 @@ function renderTimeline() {
    INCIDENT MODAL
    ================================================================ */
 
-async function openModal(inc) {
-  if (!inc) return;
+async function openModal(
+  inc,
+) {
+  if (!inc) {
+    return;
+  }
 
   const meta =
     TYPE_META[
@@ -1650,7 +2051,9 @@ async function openModal(inc) {
       "modalPanel",
     );
 
-  if (!overlay || !panel) return;
+  if (!overlay || !panel) {
+    return;
+  }
 
   panel.style.setProperty(
     "--accent",
@@ -1658,7 +2061,8 @@ async function openModal(inc) {
   );
 
   const stages =
-    inc.disasterType === "earthquake"
+    inc.disasterType ===
+    "earthquake"
       ? [
           "Reported",
           "Aftershocks",
@@ -1675,12 +2079,17 @@ async function openModal(inc) {
         ];
 
   const filledCount =
-    inc.demo ? 2 : 3;
+    inc.demo
+      ? 2
+      : 3;
 
   const heroImage =
-    typeof getCardImage === "function"
+    typeof getCardImage ===
+    "function"
       ? safeImageURL(
-          getCardImage(inc),
+          getCardImage(
+            inc,
+          ),
           inc.id,
         )
       : safeImageURL(
@@ -1689,7 +2098,9 @@ async function openModal(inc) {
         );
 
   const gallery =
-    Array.isArray(inc.gallery)
+    Array.isArray(
+      inc.gallery,
+    )
       ? inc.gallery
       : [];
 
@@ -1697,7 +2108,9 @@ async function openModal(inc) {
     <div class="modal-hero">
 
       <img
-        src="${escapeHTML(heroImage)}"
+        src="${escapeHTML(
+          heroImage,
+        )}"
         alt="${escapeHTML(
           inc.title,
         )}"
@@ -1902,7 +2315,9 @@ async function openModal(inc) {
                   heroImage,
                   ...gallery,
                 ]
-                  .filter(Boolean)
+                  .filter(
+                    Boolean,
+                  )
                   .map(
                     (g, i) => `
                       <img
@@ -1930,7 +2345,9 @@ async function openModal(inc) {
                     ? "demo-note"
                     : "real-note"
                 }"
-                style="margin-top:10px"
+                style="
+                  margin-top:10px
+                "
               >
 
                 ${
@@ -1942,7 +2359,8 @@ async function openModal(inc) {
 
                       ${
                         inc.imageAttribution &&
-                        inc.imageAttribution[0]
+                        inc
+                          .imageAttribution[0]
                           ? `
                             Photo credit:
                             ${escapeHTML(
@@ -2105,7 +2523,9 @@ async function openModal(inc) {
         id="gdeltBlock_${escapeHTML(
           inc.id,
         )}"
-        style="display:none"
+        style="
+          display:none
+        "
       >
 
         <h4>
@@ -2134,7 +2554,9 @@ async function openModal(inc) {
         id="wikiBlock_${escapeHTML(
           inc.id,
         )}"
-        style="display:none"
+        style="
+          display:none
+        "
       >
 
         <h4>
@@ -2206,7 +2628,8 @@ async function openModal(inc) {
               (s, i) => `
                 <div
                   class="tstage ${
-                    i < filledCount
+                    i <
+                    filledCount
                       ? "filled"
                       : ""
                   }"
@@ -2218,7 +2641,9 @@ async function openModal(inc) {
                   <div class="tdot"></div>
 
                   <div class="tl">
-                    ${escapeHTML(s)}
+                    ${escapeHTML(
+                      s,
+                    )}
                   </div>
 
                 </div>
@@ -2233,7 +2658,9 @@ async function openModal(inc) {
     </div>
   `;
 
-  overlay.classList.add("show");
+  overlay.classList.add(
+    "show",
+  );
 
   const closeButton =
     document.getElementById(
@@ -2241,14 +2668,19 @@ async function openModal(inc) {
     );
 
   if (closeButton) {
-    closeButton.onclick = closeModal;
+    closeButton.onclick =
+      closeModal;
   }
 
-  overlay.onclick = (e) => {
-    if (e.target === overlay) {
-      closeModal();
-    }
-  };
+  overlay.onclick =
+    (e) => {
+      if (
+        e.target ===
+        overlay
+      ) {
+        closeModal();
+      }
+    };
 
   const hero =
     document.getElementById(
@@ -2256,14 +2688,16 @@ async function openModal(inc) {
     );
 
   if (hero) {
-    hero.onerror = () => {
-      hero.onerror = null;
+    hero.onerror =
+      () => {
+        hero.onerror =
+          null;
 
-      hero.src =
-        imageFallbackHTML(
-          inc.id,
-        );
-    };
+        hero.src =
+          imageFallbackHTML(
+            inc.id,
+          );
+      };
   }
 
   fetchYouTube(
@@ -2282,7 +2716,10 @@ async function openModal(inc) {
       inc.disasterType,
     )
       .then((w) => {
-        if (!w || !w.extract) {
+        if (
+          !w ||
+          !w.extract
+        ) {
           return;
         }
 
@@ -2296,7 +2733,10 @@ async function openModal(inc) {
             `wikiContent_${inc.id}`,
           );
 
-        if (!block || !content) {
+        if (
+          !block ||
+          !content
+        ) {
           return;
         }
 
@@ -2344,9 +2784,12 @@ async function openModal(inc) {
           }
         `;
 
-        block.style.display = "block";
+        block.style.display =
+          "block";
       })
-      .catch(() => {});
+      .catch(
+        () => {},
+      );
   }
 
 
@@ -2443,7 +2886,9 @@ async function openModal(inc) {
     }
   }
 
-  renderMiniMap(inc);
+  renderMiniMap(
+    inc,
+  );
 }
 
 
@@ -2457,9 +2902,13 @@ function closeModal() {
       "modalOverlay",
     );
 
-  if (!overlay) return;
+  if (!overlay) {
+    return;
+  }
 
-  overlay.classList.remove("show");
+  overlay.classList.remove(
+    "show",
+  );
 }
 
 
@@ -2467,17 +2916,22 @@ function closeModal() {
    MINI MAP
    ================================================================ */
 
-function renderMiniMap(inc) {
+function renderMiniMap(
+  inc,
+) {
   if (
-    typeof window.L === "undefined" ||
+    typeof window.L ===
+      "undefined" ||
     !inc
   ) {
     return;
   }
 
   if (
-    typeof inc.lat !== "number" ||
-    typeof inc.lng !== "number"
+    typeof inc.lat !==
+      "number" ||
+    typeof inc.lng !==
+      "number"
   ) {
     const container =
       document.getElementById(
@@ -2509,18 +2963,25 @@ function renderMiniMap(inc) {
       `miniMap_${inc.id}`,
     );
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
   try {
     const map =
       L.map(
         container,
         {
-          zoomControl: true,
-          attributionControl: true,
+          zoomControl:
+            true,
+          attributionControl:
+            true,
         },
       ).setView(
-        [inc.lat, inc.lng],
+        [
+          inc.lat,
+          inc.lng,
+        ],
         9,
       );
 
@@ -2529,7 +2990,7 @@ function renderMiniMap(inc) {
       {
         maxZoom: 18,
         attribution:
-          '&copy; OpenStreetMap contributors',
+          "&copy; OpenStreetMap contributors",
       },
     ).addTo(map);
 
@@ -2540,13 +3001,19 @@ function renderMiniMap(inc) {
       TYPE_META.earthquake;
 
     L.circleMarker(
-      [inc.lat, inc.lng],
+      [
+        inc.lat,
+        inc.lng,
+      ],
       {
         radius: 9,
-        color: meta.color,
+        color:
+          meta.color,
         weight: 2,
-        fillColor: meta.color,
-        fillOpacity: 0.75,
+        fillColor:
+          meta.color,
+        fillOpacity:
+          0.75,
       },
     )
       .addTo(map)
@@ -2559,7 +3026,8 @@ function renderMiniMap(inc) {
       .openPopup();
 
     setTimeout(
-      () => map.invalidateSize(),
+      () =>
+        map.invalidateSize(),
       100,
     );
   } catch (err) {
@@ -2575,8 +3043,12 @@ function renderMiniMap(inc) {
    MEDIA MODAL
    ================================================================ */
 
-function openMediaModal(item) {
-  if (!item) return;
+function openMediaModal(
+  item,
+) {
+  if (!item) {
+    return;
+  }
 
   const overlay =
     document.getElementById(
@@ -2588,7 +3060,9 @@ function openMediaModal(item) {
       "modalPanel",
     );
 
-  if (!overlay || !panel) return;
+  if (!overlay || !panel) {
+    return;
+  }
 
   const type =
     item.contentType ||
@@ -2605,7 +3079,8 @@ function openMediaModal(item) {
       item.tileImg ||
         item.image ||
         item.url,
-      item.id || "media",
+      item.id ||
+        "media",
     );
 
   panel.style.setProperty(
@@ -2613,9 +3088,13 @@ function openMediaModal(item) {
     meta.color,
   );
 
-  let mediaHTML = "";
+  let mediaHTML =
+    "";
 
-  if (type === "video") {
+  if (
+    type ===
+    "video"
+  ) {
     const videoUrl =
       item.url ||
       item.mediaData?.url ||
@@ -2629,6 +3108,7 @@ function openMediaModal(item) {
         align-items:center;
         justify-content:center;
       ">
+
         ${
           videoUrl
             ? `
@@ -2656,12 +3136,15 @@ function openMediaModal(item) {
               </span>
             `
         }
+
       </div>
     `;
   } else {
     mediaHTML = `
       <img
-        src="${escapeHTML(image)}"
+        src="${escapeHTML(
+          image,
+        )}"
         alt="${escapeHTML(
           item.title ||
             "Nepal disaster media",
@@ -2702,7 +3185,9 @@ function openMediaModal(item) {
           "
         >
           ${meta.icon}
-          ${escapeHTML(meta.tag)}
+          ${escapeHTML(
+            meta.tag,
+          )}
         </span>
 
         <h2>
@@ -2716,7 +3201,9 @@ function openMediaModal(item) {
 
           <span>
             ${escapeHTML(
-              getMediaSource(item),
+              getMediaSource(
+                item,
+              ),
             )}
           </span>
 
@@ -2750,9 +3237,11 @@ function openMediaModal(item) {
 
         <p>
           ${
-            type === "image"
+            type ===
+            "image"
               ? "Public reference imagery from the configured media source."
-              : type === "video"
+              : type ===
+                  "video"
                 ? "Public video result from the configured video source."
                 : "Public news article from the configured news source."
           }
@@ -2778,7 +3267,8 @@ function openMediaModal(item) {
       </div>
 
       ${
-        type === "news"
+        type ===
+        "news"
           ? `
             <div class="modal-block">
 
@@ -2802,7 +3292,9 @@ function openMediaModal(item) {
     </div>
   `;
 
-  overlay.classList.add("show");
+  overlay.classList.add(
+    "show",
+  );
 
   const closeButton =
     document.getElementById(
@@ -2814,11 +3306,15 @@ function openMediaModal(item) {
       closeModal;
   }
 
-  overlay.onclick = (e) => {
-    if (e.target === overlay) {
-      closeModal();
-    }
-  };
+  overlay.onclick =
+    (e) => {
+      if (
+        e.target ===
+        overlay
+      ) {
+        closeModal();
+      }
+    };
 
   const mediaImg =
     panel.querySelector(
@@ -2826,13 +3322,17 @@ function openMediaModal(item) {
     );
 
   if (mediaImg) {
-    mediaImg.onerror = () => {
-      mediaImg.onerror = null;
-      mediaImg.src =
-        imageFallbackHTML(
-          item.id || "media",
-        );
-    };
+    mediaImg.onerror =
+      () => {
+        mediaImg.onerror =
+          null;
+
+        mediaImg.src =
+          imageFallbackHTML(
+            item.id ||
+              "media",
+          );
+      };
   }
 }
 
@@ -2845,7 +3345,12 @@ async function fetchYouTube(
   inc,
   container,
 ) {
-  if (!container || !inc) return;
+  if (
+    !container ||
+    !inc
+  ) {
+    return;
+  }
 
   try {
     const params =
@@ -2867,7 +3372,9 @@ async function fetchYouTube(
     if (inc.date) {
       params.set(
         "date",
-        String(inc.date),
+        String(
+          inc.date,
+        ),
       );
     }
 
@@ -2895,12 +3402,12 @@ async function fetchYouTube(
       Array.isArray(data)
         ? data
         : Array.isArray(
-            data?.videos,
-          )
+              data?.videos,
+            )
           ? data.videos
           : Array.isArray(
-              data?.items,
-            )
+                data?.items,
+              )
             ? data.items
             : [];
 
@@ -2921,136 +3428,155 @@ async function fetchYouTube(
     container.innerHTML =
       videos
         .slice(0, 6)
-        .map((video, index) => {
-          const title =
-            video.title ||
-            video.name ||
-            "Nepal disaster video";
+        .map(
+          (
+            video,
+            index,
+          ) => {
+            const title =
+              video.title ||
+              video.name ||
+              "Nepal disaster video";
 
-          const url =
-            video.url ||
-            video.videoUrl ||
-            video.link ||
-            (
-              video.id
-                ? `https://www.youtube.com/watch?v=${encodeURIComponent(
-                    video.id,
-                  )}`
-                : ""
-            );
+            const url =
+              video.url ||
+              video.videoUrl ||
+              video.link ||
+              (
+                video.id
+                  ? `https://www.youtube.com/watch?v=${encodeURIComponent(
+                      video.id,
+                    )}`
+                  : ""
+              );
 
-          const thumbnail =
-            safeImageURL(
-              video.thumbnail ||
-                video.thumbnailUrl ||
-                video.image,
-              `youtube-${inc.id}-${index}`,
-            );
+            const thumbnail =
+              safeImageURL(
+                video.thumbnail ||
+                  video.thumbnailUrl ||
+                  video.image,
+                `youtube-${inc.id}-${index}`,
+              );
 
-          const channel =
-            video.channel ||
-            video.channelTitle ||
-            video.source ||
-            "YouTube";
+            const channel =
+              video.channel ||
+              video.channelTitle ||
+              video.source ||
+              "YouTube";
 
-          return `
-            <article
-              class="video-card"
-              style="
-                overflow:hidden;
-                border:1px solid var(--panel-border);
-                background:var(--bg-2);
-              "
-            >
-
-              <div style="
-                aspect-ratio:16/9;
-                overflow:hidden;
-              ">
-
-                <img
-                  src="${escapeHTML(
-                    thumbnail,
-                  )}"
-                  alt="${escapeHTML(
-                    title,
-                  )}"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                    display:block;
-                  "
-                >
-
-              </div>
-
-              <div style="
-                padding:10px;
-              ">
+            return `
+              <article
+                class="video-card"
+                style="
+                  overflow:hidden;
+                  border:1px solid var(--panel-border);
+                  background:var(--bg-2);
+                "
+              >
 
                 <div style="
-                  font:700 13px var(--font-display);
-                  line-height:1.2;
-                  margin-bottom:6px;
-                  color:var(--text-0);
+                  aspect-ratio:16/9;
+                  overflow:hidden;
                 ">
-                  ${escapeHTML(title)}
+
+                  <img
+                    src="${escapeHTML(
+                      thumbnail,
+                    )}"
+                    alt="${escapeHTML(
+                      title,
+                    )}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    style="
+                      width:100%;
+                      height:100%;
+                      object-fit:cover;
+                      display:block;
+                    "
+                  >
+
                 </div>
 
                 <div style="
-                  font:10px var(--font-mono);
-                  color:var(--text-2);
-                  margin-bottom:8px;
+                  padding:10px;
                 ">
-                  ${escapeHTML(channel)}
+
+                  <div style="
+                    font:700 13px var(--font-display);
+                    line-height:1.2;
+                    margin-bottom:6px;
+                    color:var(--text-0);
+                  ">
+                    ${escapeHTML(
+                      title,
+                    )}
+                  </div>
+
+                  <div style="
+                    font:10px var(--font-mono);
+                    color:var(--text-2);
+                    margin-bottom:8px;
+                  ">
+                    ${escapeHTML(
+                      channel,
+                    )}
+                  </div>
+
+                  ${
+                    url
+                      ? `
+                        <a
+                          class="news-btn"
+                          href="${escapeHTML(
+                            url,
+                          )}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          WATCH →
+                        </a>
+                      `
+                      : ""
+                  }
+
                 </div>
 
-                ${
-                  url
-                    ? `
-                      <a
-                        class="news-btn"
-                        href="${escapeHTML(
-                          url,
-                        )}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        WATCH →
-                      </a>
-                    `
-                    : ""
-                }
-
-              </div>
-
-            </article>
-          `;
-        })
+              </article>
+            `;
+          },
+        )
         .join("");
 
     container
-      .querySelectorAll("img")
-      .forEach((img, index) => {
-        img.onerror = () => {
-          if (
-            img.dataset.fallback ===
-            "1"
-          ) {
-            return;
-          }
+      .querySelectorAll(
+        "img",
+      )
+      .forEach(
+        (
+          img,
+          index,
+        ) => {
+          img.onerror =
+            () => {
+              if (
+                img.dataset
+                  .fallback ===
+                "1"
+              ) {
+                return;
+              }
 
-          img.dataset.fallback = "1";
+              img.dataset.fallback =
+                "1";
 
-          img.src =
-            imageFallbackHTML(
-              `youtube-${inc.id}-${index}`,
-            );
-        };
-      });
+              img.src =
+                imageFallbackHTML(
+                  `youtube-${inc.id}-${index}`,
+                );
+            };
+        },
+      );
   } catch (error) {
     console.warn(
       "YouTube loading failed",
@@ -3088,7 +3614,9 @@ async function loadWikiSummary(
   };
 
   const title =
-    titles[disasterType] ||
+    titles[
+      disasterType
+    ] ||
     "Natural disaster";
 
   const url =
@@ -3098,12 +3626,15 @@ async function loadWikiSummary(
 
   try {
     const response =
-      await fetch(url, {
-        headers: {
-          Accept:
-            "application/json",
+      await fetch(
+        url,
+        {
+          headers: {
+            Accept:
+              "application/json",
+          },
         },
-      });
+      );
 
     if (!response.ok) {
       throw new Error(
@@ -3116,7 +3647,9 @@ async function loadWikiSummary(
 
     return {
       extract:
-        data.extract || "",
+        data.extract ||
+        "",
+
       url:
         data.content_urls
           ?.desktop?.page ||
@@ -3146,7 +3679,8 @@ document.addEventListener(
   "keydown",
   (e) => {
     if (
-      e.key === "Escape"
+      e.key ===
+      "Escape"
     ) {
       const overlay =
         document.getElementById(
