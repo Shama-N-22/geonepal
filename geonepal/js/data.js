@@ -543,7 +543,7 @@ async function loadBipadHazard(
         gallery: [],
         demo: false,
         source: "BIPAD",
-        bipadUrl: `${BIPAD_BASE_URL}/incident/${r.id}/`,
+        bipadUrl: `https://bipadportal.gov.np/`,
         newsCount: 1,
         videoCount: 0,
         imageCount: 0,
