@@ -1,5 +1,5 @@
-```html
 <!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -13,7 +13,11 @@
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
@@ -29,20 +33,33 @@
 
     <style>
       /* =========================================================
-       GEONEPAL HOMEPAGE ENHANCEMENTS
-       ========================================================= */
+         GEONEPAL HOMEPAGE ENHANCEMENTS
+         ========================================================= */
 
+      /* ---------- RAW HTML / SPLASH PROTECTION ---------- */
+
+      html {
+        background: #08090b;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      /* Keep the splash immediately on top while the page loads */
       #splash {
         position: fixed;
         inset: 0;
         z-index: 99999;
         overflow: hidden;
+        background: #08090b;
       }
 
       #splash::before {
         content: "";
         position: absolute;
         inset: 0;
+
         background:
           radial-gradient(
             circle at 70% 35%,
@@ -60,14 +77,17 @@
             rgba(255, 255, 255, 0.025) 49%,
             transparent 50%
           );
+
         pointer-events: none;
       }
 
       #splash::after {
         content: "27.7°N 85.3°E   //   HIMALAYAN REGION   //   LIVE ARCHIVE";
+
         position: absolute;
         left: 30px;
         bottom: 26px;
+
         font-family: var(--font-mono);
         font-size: 9px;
         letter-spacing: 0.18em;
@@ -77,7 +97,9 @@
       .splash-word {
         position: relative;
         z-index: 2;
+
         letter-spacing: -0.045em;
+
         text-shadow:
           0 0 40px rgba(47, 168, 255, 0.08),
           0 0 80px rgba(255, 90, 60, 0.05);
@@ -86,6 +108,7 @@
       .splash-sub {
         position: relative;
         z-index: 2;
+
         letter-spacing: 0.12em;
         text-transform: uppercase;
       }
@@ -93,6 +116,7 @@
       .splash-enter {
         position: relative;
         z-index: 2;
+
         transition:
           transform 0.25s ease,
           box-shadow 0.25s ease,
@@ -104,7 +128,9 @@
         box-shadow: 0 14px 50px rgba(47, 168, 255, 0.15);
       }
 
-      /* ---------- HERO ---------- */
+      /* =========================================================
+         HERO
+         ========================================================= */
 
       .hero {
         position: relative;
@@ -113,50 +139,68 @@
 
       .hero::before {
         content: "";
+
         position: absolute;
+
         width: 650px;
         height: 650px;
+
         right: -220px;
         top: -180px;
+
         border-radius: 50%;
+
         background: radial-gradient(
           circle,
           rgba(47, 168, 255, 0.12),
           transparent 68%
         );
+
         pointer-events: none;
       }
 
       .hero::after {
         content: "";
+
         position: absolute;
+
         width: 500px;
         height: 500px;
+
         left: -280px;
         bottom: -260px;
+
         border-radius: 50%;
+
         background: radial-gradient(
           circle,
           rgba(255, 90, 60, 0.09),
           transparent 70%
         );
+
         pointer-events: none;
       }
 
-      /* ---------- HERO TOP META ---------- */
+      /* =========================================================
+         HERO TOP META
+         ========================================================= */
 
       .hero-intel-top {
         position: relative;
         z-index: 4;
+
         width: min(1180px, calc(100% - 48px));
         margin: 0 auto 18px;
+
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 20px;
+
         font-family: var(--font-mono);
         font-size: 9px;
         letter-spacing: 0.13em;
+
         color: var(--text-2);
         text-transform: uppercase;
       }
@@ -174,9 +218,13 @@
       .hero-intel-location .pulse {
         width: 7px;
         height: 7px;
+
         border-radius: 50%;
+
         background: #39d97a;
+
         box-shadow: 0 0 0 5px rgba(57, 217, 122, 0.08);
+
         animation: geoPulse 1.8s infinite;
       }
 
@@ -191,7 +239,9 @@
         }
       }
 
-      /* ---------- HERO TITLE ---------- */
+      /* =========================================================
+         HERO TITLE
+         ========================================================= */
 
       .hero-title-wrap {
         position: relative;
@@ -202,18 +252,24 @@
         display: inline-flex;
         align-items: center;
         gap: 9px;
+
         margin-bottom: 12px;
+
         font-family: var(--font-mono);
         font-size: 9px;
         letter-spacing: 0.2em;
+
         color: var(--text-2);
+
         text-transform: uppercase;
       }
 
       .hero-kicker::before {
         content: "";
+
         width: 28px;
         height: 1px;
+
         background: var(--flood);
       }
 
@@ -225,32 +281,46 @@
 
       .hero-subline {
         max-width: 760px;
+
         margin: 10px auto 0;
+
         font-family: var(--font-mono);
         font-size: 10px;
         letter-spacing: 0.14em;
+
         color: var(--text-2);
+
         text-transform: uppercase;
       }
 
-      /* ---------- LIVE INTELLIGENCE STRIP ---------- */
+      /* =========================================================
+         LIVE INTELLIGENCE STRIP
+         ========================================================= */
 
       .intel-strip {
         position: relative;
         z-index: 5;
+
         width: min(1180px, calc(100% - 48px));
         margin: 28px auto 0;
+
         display: grid;
         grid-template-columns: repeat(4, 1fr);
+
         border: 1px solid rgba(255, 255, 255, 0.08);
+
         background: rgba(255, 255, 255, 0.025);
+
         backdrop-filter: blur(14px);
       }
 
       .intel-cell {
         min-height: 92px;
+
         padding: 18px 20px;
+
         border-right: 1px solid rgba(255, 255, 255, 0.07);
+
         position: relative;
         overflow: hidden;
       }
@@ -261,12 +331,17 @@
 
       .intel-cell::after {
         content: "";
+
         position: absolute;
+
         width: 80px;
         height: 80px;
+
         right: -35px;
         bottom: -45px;
+
         border-radius: 50%;
+
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
 
@@ -274,12 +349,15 @@
         font-family: var(--font-mono);
         font-size: 8px;
         letter-spacing: 0.17em;
+
         color: var(--text-2);
+
         text-transform: uppercase;
       }
 
       .intel-value {
         margin-top: 5px;
+
         font-family: var(--font-display);
         font-size: 30px;
         line-height: 0.95;
@@ -289,9 +367,12 @@
 
       .intel-note {
         margin-top: 5px;
+
         font-family: var(--font-mono);
         font-size: 8px;
+
         color: rgba(255, 255, 255, 0.38);
+
         text-transform: uppercase;
       }
 
@@ -299,39 +380,57 @@
         color: #39d97a;
       }
 
-      /* ---------- INCIDENT TICKER ---------- */
+      /* =========================================================
+         INCIDENT TICKER
+         ========================================================= */
 
       .incident-ticker {
         position: relative;
         z-index: 5;
+
         width: min(1180px, calc(100% - 48px));
+
         margin: 12px auto 0;
+
         min-height: 34px;
+
         border-top: 1px solid rgba(255, 255, 255, 0.055);
         border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+
         display: flex;
         align-items: center;
+
         overflow: hidden;
+
         font-family: var(--font-mono);
         font-size: 8px;
         letter-spacing: 0.1em;
+
         text-transform: uppercase;
       }
 
       .ticker-label {
         flex: 0 0 auto;
+
         padding: 0 14px;
+
         height: 34px;
+
         display: flex;
         align-items: center;
+
         background: rgba(255, 90, 60, 0.08);
+
         color: var(--flood);
+
         border-right: 1px solid rgba(255, 255, 255, 0.06);
       }
 
       .ticker-track {
         white-space: nowrap;
+
         animation: tickerMove 28s linear infinite;
+
         color: var(--text-2);
       }
 
@@ -349,12 +448,16 @@
         }
       }
 
-      /* ---------- HOMEPAGE NEWS ---------- */
+      /* =========================================================
+         HOMEPAGE NEWS
+         ========================================================= */
 
       .home-news {
         position: relative;
         z-index: 5;
+
         width: min(1180px, calc(100% - 48px));
+
         margin: 48px auto 0;
       }
 
@@ -362,40 +465,55 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
+
         gap: 20px;
+
         margin-bottom: 15px;
       }
 
       .home-news-title {
         margin-top: 4px;
+
         font-family: var(--font-display);
         font-size: clamp(25px, 4vw, 40px);
         font-weight: 800;
+
         letter-spacing: -0.025em;
         line-height: 0.95;
       }
 
       .home-news-sub {
         margin-top: 7px;
+
         font-family: var(--font-mono);
         font-size: 9px;
+
         color: var(--text-2);
+
         letter-spacing: 0.08em;
       }
 
       .home-news-track {
         display: grid;
+
         grid-template-columns: repeat(3, 1fr);
+
         gap: 12px;
       }
 
       .home-news-card {
         position: relative;
+
         min-height: 255px;
+
         overflow: hidden;
+
         border: 1px solid rgba(255, 255, 255, 0.08);
+
         background: #111;
+
         cursor: pointer;
+
         transition:
           transform 0.35s ease,
           border-color 0.35s ease;
@@ -403,16 +521,22 @@
 
       .home-news-card:hover {
         transform: translateY(-5px);
+
         border-color: rgba(255, 255, 255, 0.2);
       }
 
       .home-news-card img {
         width: 100%;
         height: 100%;
+
         min-height: 255px;
+
         object-fit: cover;
+
         display: block;
+
         opacity: 0.78;
+
         transition:
           transform 0.6s ease,
           opacity 0.4s ease;
@@ -420,24 +544,30 @@
 
       .home-news-card:hover img {
         transform: scale(1.06);
+
         opacity: 0.9;
       }
 
       .home-news-card::after {
         content: "";
+
         position: absolute;
+
         inset: 35% 0 0;
+
         background: linear-gradient(
           to bottom,
           transparent,
           rgba(0, 0, 0, 0.92)
         );
+
         pointer-events: none;
       }
 
       .home-news-content {
         position: absolute;
         z-index: 2;
+
         left: 16px;
         right: 16px;
         bottom: 15px;
@@ -445,89 +575,369 @@
 
       .home-news-tag {
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         letter-spacing: 0.16em;
+
         color: var(--flood);
+
         text-transform: uppercase;
       }
 
       .home-news-card h3 {
         margin: 5px 0 0;
+
         font-family: var(--font-display);
+
         font-size: 23px;
+
         line-height: 0.98;
+
         font-weight: 800;
       }
 
       .home-news-card p {
         margin: 7px 0 0;
+
         font-size: 10px;
+
         color: rgba(255, 255, 255, 0.62);
+
         line-height: 1.45;
       }
 
       .home-news-source {
         margin-top: 9px;
+
         font-family: var(--font-mono);
+
         font-size: 7px;
+
         color: rgba(255, 255, 255, 0.35);
+
         text-transform: uppercase;
       }
 
-      /* ---------- SECTION DIVIDER ---------- */
+      /* =========================================================
+         SECTION DIVIDER
+         ========================================================= */
 
       .home-section {
         position: relative;
+
         z-index: 4;
+
         width: min(1180px, calc(100% - 48px));
+
         margin: 58px auto 0;
       }
 
       .home-section-heading {
         display: flex;
+
         align-items: flex-end;
+
         justify-content: space-between;
+
         gap: 20px;
+
         margin-bottom: 18px;
       }
 
       .home-section-heading h2 {
         margin: 0;
+
         font-family: var(--font-display);
+
         font-size: clamp(30px, 5vw, 48px);
+
         line-height: 0.9;
+
         letter-spacing: -0.03em;
+
         font-weight: 800;
       }
 
       .home-section-heading p {
         max-width: 360px;
+
         margin: 0;
+
         font-size: 10px;
+
         color: var(--text-2);
+
         line-height: 1.5;
+
         text-align: right;
       }
 
-      /* ---------- DISASTER FEATURE PANELS ---------- */
+      /* =========================================================
+         ★ MAIN HAZARD SELECTION
+         MOVED ABOVE ARCHIVE
+         ========================================================= */
+
+      .hazard-selection {
+        margin-top: 42px;
+      }
+
+      .hazard-selection .home-section-heading {
+        margin-bottom: 14px;
+      }
+
+      .hazard-selection .home-section-heading h2 {
+        font-size: clamp(34px, 5vw, 54px);
+      }
+
+      .hazard-selection .home-section-heading p {
+        max-width: 420px;
+      }
+
+      .hazard-selection .cat-grid {
+        margin-top: 0;
+      }
+
+      .hazard-selection .cat-card {
+        min-height: 235px;
+
+        border: 1px solid rgba(255, 255, 255, 0.11);
+
+        background:
+          linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.045),
+            rgba(255, 255, 255, 0.012)
+          );
+
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.025),
+          0 10px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      .hazard-selection .cat-card:hover {
+        border-color: rgba(47, 168, 255, 0.35);
+
+        box-shadow:
+          0 15px 45px rgba(0, 0, 0, 0.22),
+          0 0 35px rgba(47, 168, 255, 0.045);
+      }
+
+      /* =========================================================
+         ★ COMPACT ARCHIVE INTRO
+         ========================================================= */
+
+      .archive-intro-section {
+        margin-top: 38px;
+      }
+
+      .archive-intro-section .home-section-heading {
+        display: block;
+
+        margin-bottom: 12px;
+      }
+
+      .archive-intro-section .home-section-heading p {
+        display: none;
+      }
+
+      /*
+        Compact one-line archive banner.
+        The image sits on the right while the archive title
+        remains the main text.
+      */
+
+      .archive-banner {
+        position: relative;
+
+        min-height: 142px;
+
+        display: grid;
+
+        grid-template-columns: 1fr 220px;
+
+        overflow: hidden;
+
+        border: 1px solid rgba(255, 255, 255, 0.09);
+
+        background:
+          linear-gradient(
+            110deg,
+            rgba(255, 255, 255, 0.045),
+            rgba(255, 255, 255, 0.012)
+          );
+
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.025),
+          0 15px 50px rgba(0, 0, 0, 0.12);
+      }
+
+      .archive-banner-content {
+        position: relative;
+        z-index: 2;
+
+        min-width: 0;
+
+        padding: 22px 26px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 28px;
+      }
+
+      .archive-banner-copy {
+        min-width: 0;
+      }
+
+      .archive-banner-kicker {
+        font-family: var(--font-mono);
+
+        font-size: 8px;
+
+        letter-spacing: 0.18em;
+
+        color: var(--text-2);
+
+        text-transform: uppercase;
+      }
+
+      .archive-banner-title {
+        margin-top: 5px;
+
+        font-family: var(--font-display);
+
+        font-size: clamp(32px, 5vw, 48px);
+
+        font-weight: 900;
+
+        line-height: 0.88;
+
+        letter-spacing: -0.035em;
+
+        white-space: nowrap;
+      }
+
+      .archive-banner-description {
+        max-width: 620px;
+
+        margin-top: 8px;
+
+        font-size: 9px;
+
+        line-height: 1.45;
+
+        color: var(--text-2);
+      }
+
+      .archive-banner-image {
+        position: relative;
+
+        height: 100%;
+
+        min-height: 142px;
+
+        overflow: hidden;
+      }
+
+      .archive-banner-image::before {
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        z-index: 1;
+
+        background:
+          linear-gradient(
+            to right,
+            rgba(8, 9, 11, 0.55),
+            transparent 60%
+          ),
+          linear-gradient(
+            to top,
+            rgba(8, 9, 11, 0.45),
+            transparent 60%
+          );
+      }
+
+      .archive-banner-image img {
+        width: 100%;
+
+        height: 100%;
+
+        min-height: 142px;
+
+        object-fit: cover;
+
+        display: block;
+
+        opacity: 0.72;
+
+        filter: saturate(0.82) contrast(1.04);
+
+        transition:
+          transform 0.6s ease,
+          opacity 0.4s ease;
+      }
+
+      .archive-banner:hover .archive-banner-image img {
+        transform: scale(1.06);
+
+        opacity: 0.86;
+      }
+
+      .archive-banner-image-label {
+        position: absolute;
+
+        z-index: 2;
+
+        right: 13px;
+
+        bottom: 11px;
+
+        font-family: var(--font-mono);
+
+        font-size: 7px;
+
+        letter-spacing: 0.12em;
+
+        color: rgba(255, 255, 255, 0.58);
+
+        text-transform: uppercase;
+      }
+
+      /* =========================================================
+         DISASTER FEATURE PANELS
+         ========================================================= */
 
       .disaster-feature-grid {
         display: grid;
+
         grid-template-columns: 1.35fr 1fr;
+
         gap: 12px;
       }
 
       .disaster-feature {
         position: relative;
+
         min-height: 315px;
+
         padding: 22px;
+
         overflow: hidden;
+
         border: 1px solid rgba(255, 255, 255, 0.08);
+
         background: linear-gradient(
           135deg,
           rgba(255, 255, 255, 0.045),
           rgba(255, 255, 255, 0.012)
         );
+
         transition:
           transform 0.3s ease,
           border-color 0.3s ease;
@@ -535,11 +945,13 @@
 
       .disaster-feature:hover {
         transform: translateY(-4px);
+
         border-color: rgba(255, 255, 255, 0.18);
       }
 
       .disaster-feature.main-feature {
         min-height: 410px;
+
         background:
           radial-gradient(
             circle at 80% 25%,
@@ -555,65 +967,102 @@
 
       .feature-number {
         font-family: var(--font-mono);
+
         font-size: 9px;
+
         color: var(--text-2);
+
         letter-spacing: 0.15em;
       }
 
       .feature-icon {
         position: absolute;
+
         right: 24px;
         top: 18px;
+
         font-size: 42px;
+
         opacity: 0.65;
+
         filter: grayscale(0.25);
       }
 
       .feature-title {
         position: absolute;
+
         left: 22px;
         bottom: 74px;
+
         font-family: var(--font-display);
+
         font-size: clamp(42px, 7vw, 78px);
+
         font-weight: 900;
+
         line-height: 0.82;
+
         letter-spacing: -0.04em;
       }
 
       .feature-description {
         position: absolute;
+
         left: 22px;
         right: 22px;
         bottom: 22px;
+
         max-width: 580px;
+
         font-size: 10px;
+
         line-height: 1.5;
+
         color: var(--text-2);
       }
 
       .feature-corner {
         position: absolute;
+
         right: 20px;
         bottom: 20px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         color: var(--flood);
+
         letter-spacing: 0.12em;
       }
 
-      /* ---------- CATEGORY GRID ---------- */
+      /* =========================================================
+         CATEGORY GRID
+         ========================================================= */
 
       .cat-grid {
         position: relative;
+
         z-index: 5;
+
         margin-top: 16px;
+
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 12px;
       }
 
       .cat-card {
         min-height: 250px;
+
         position: relative;
+
         overflow: hidden;
+
         cursor: pointer;
+
         transition:
           transform 0.3s ease,
           border-color 0.3s ease;
@@ -621,13 +1070,19 @@
 
       .cat-card::before {
         content: "";
+
         position: absolute;
+
         width: 180px;
         height: 180px;
+
         right: -70px;
         top: -70px;
+
         border-radius: 50%;
+
         border: 1px solid rgba(255, 255, 255, 0.05);
+
         transition: transform 0.4s ease;
       }
 
@@ -641,6 +1096,7 @@
 
       .cat-card:focus-visible {
         outline: 2px solid var(--flood);
+
         outline-offset: 3px;
       }
 
@@ -650,29 +1106,44 @@
 
       .cat-number {
         position: absolute;
+
         top: 18px;
         right: 20px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         color: rgba(255, 255, 255, 0.28);
+
         letter-spacing: 0.15em;
       }
 
-      /* ---------- HOMEPAGE MAP ---------- */
+      /* =========================================================
+         HOMEPAGE MAP
+         ========================================================= */
 
       .home-map-panel {
         display: grid;
+
         grid-template-columns: 1.5fr 1fr;
+
         min-height: 360px;
+
         border: 1px solid rgba(255, 255, 255, 0.08);
+
         overflow: hidden;
+
         background: rgba(255, 255, 255, 0.018);
       }
 
       .home-map-visual {
         position: relative;
+
         min-height: 360px;
+
         overflow: hidden;
+
         background:
           radial-gradient(
             circle at 50% 45%,
@@ -693,13 +1164,19 @@
 
       .map-crosshair {
         position: absolute;
+
         left: 50%;
         top: 50%;
+
         width: 160px;
         height: 160px;
+
         transform: translate(-50%, -50%);
+
         border: 1px solid rgba(47, 168, 255, 0.22);
+
         border-radius: 50%;
+
         box-shadow:
           0 0 0 30px rgba(47, 168, 255, 0.025),
           0 0 0 65px rgba(47, 168, 255, 0.015);
@@ -708,13 +1185,16 @@
       .map-crosshair::before,
       .map-crosshair::after {
         content: "";
+
         position: absolute;
+
         background: rgba(47, 168, 255, 0.22);
       }
 
       .map-crosshair::before {
         width: 1px;
         height: 230px;
+
         left: 50%;
         top: -35px;
       }
@@ -722,17 +1202,23 @@
       .map-crosshair::after {
         height: 1px;
         width: 230px;
+
         top: 50%;
         left: -35px;
       }
 
       .map-dot {
         position: absolute;
+
         width: 7px;
         height: 7px;
+
         border-radius: 50%;
+
         background: var(--flood);
+
         box-shadow: 0 0 0 6px rgba(255, 90, 60, 0.08);
+
         animation: mapDotPulse 2.2s infinite;
       }
 
@@ -740,19 +1226,25 @@
         left: 38%;
         top: 38%;
       }
+
       .map-dot.d2 {
         left: 59%;
         top: 44%;
+
         animation-delay: 0.5s;
       }
+
       .map-dot.d3 {
         left: 49%;
         top: 64%;
+
         animation-delay: 1s;
       }
+
       .map-dot.d4 {
         left: 68%;
         top: 57%;
+
         animation-delay: 1.4s;
       }
 
@@ -760,102 +1252,152 @@
         0%,
         100% {
           transform: scale(1);
+
           box-shadow: 0 0 0 4px rgba(255, 90, 60, 0.08);
         }
 
         50% {
           transform: scale(1.4);
+
           box-shadow: 0 0 0 12px rgba(255, 90, 60, 0);
         }
       }
 
       .map-coordinates {
         position: absolute;
+
         left: 18px;
         top: 18px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         line-height: 1.8;
+
         color: rgba(255, 255, 255, 0.35);
       }
 
       .map-caption {
         position: absolute;
+
         left: 18px;
         bottom: 18px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         letter-spacing: 0.12em;
+
         color: rgba(255, 255, 255, 0.45);
       }
 
       .home-map-info {
         padding: 28px;
+
         border-left: 1px solid rgba(255, 255, 255, 0.07);
+
         display: flex;
+
         flex-direction: column;
+
         justify-content: space-between;
       }
 
       .home-map-info h3 {
         margin: 7px 0 0;
+
         font-family: var(--font-display);
+
         font-size: 42px;
+
         line-height: 0.9;
+
         font-weight: 800;
       }
 
       .home-map-info p {
         margin: 14px 0 0;
+
         font-size: 10px;
+
         line-height: 1.55;
+
         color: var(--text-2);
       }
 
       .map-stat-grid {
         display: grid;
+
         grid-template-columns: 1fr 1fr;
+
         gap: 8px;
+
         margin-top: 25px;
       }
 
       .map-stat {
         padding: 13px;
+
         border: 1px solid rgba(255, 255, 255, 0.07);
+
         background: rgba(255, 255, 255, 0.018);
       }
 
       .map-stat strong {
         display: block;
+
         font-family: var(--font-display);
+
         font-size: 25px;
+
         line-height: 1;
       }
 
       .map-stat span {
         display: block;
+
         margin-top: 5px;
+
         font-family: var(--font-mono);
+
         font-size: 7px;
+
         color: var(--text-2);
+
         letter-spacing: 0.1em;
       }
 
       .map-open {
         width: 100%;
+
         margin-top: 22px;
+
         display: inline-flex;
+
         justify-content: space-between;
+
         align-items: center;
+
         padding: 13px 15px;
+
         border: 1px solid rgba(255, 255, 255, 0.12);
+
         background: transparent;
+
         color: rgba(255, 255, 255, 0.8);
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         letter-spacing: 0.12em;
+
         cursor: pointer;
+
         text-decoration: none;
+
         transition:
           background 0.25s ease,
           border-color 0.25s ease,
@@ -864,30 +1406,43 @@
 
       .map-open:hover {
         background: rgba(255, 255, 255, 0.05);
+
         border-color: rgba(255, 255, 255, 0.22);
+
         transform: translateY(-2px);
       }
 
-      /* ---------- MEDIA STRIP ---------- */
+      /* =========================================================
+         MEDIA STRIP
+         ========================================================= */
 
       .media-showcase {
         display: grid;
+
         grid-template-columns: repeat(4, 1fr);
+
         gap: 10px;
       }
 
       .media-showcase-card {
         min-height: 145px;
+
         position: relative;
+
         overflow: hidden;
+
         border: 1px solid rgba(255, 255, 255, 0.07);
+
         background: rgba(255, 255, 255, 0.02);
       }
 
       .media-showcase-card::before {
         content: "";
+
         position: absolute;
+
         inset: 0;
+
         background: linear-gradient(
           135deg,
           rgba(47, 168, 255, 0.12),
@@ -921,23 +1476,31 @@
 
       .media-showcase-index {
         position: absolute;
+
         left: 14px;
         top: 13px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         color: rgba(255, 255, 255, 0.3);
       }
 
       .media-showcase-icon {
         position: absolute;
+
         right: 14px;
         top: 10px;
+
         font-size: 25px;
+
         opacity: 0.45;
       }
 
       .media-showcase-text {
         position: absolute;
+
         left: 14px;
         bottom: 14px;
         right: 14px;
@@ -945,31 +1508,45 @@
 
       .media-showcase-text strong {
         display: block;
+
         font-family: var(--font-display);
+
         font-size: 22px;
+
         line-height: 0.9;
       }
 
       .media-showcase-text span {
         display: block;
+
         margin-top: 6px;
+
         font-family: var(--font-mono);
+
         font-size: 7px;
+
         color: var(--text-2);
+
         letter-spacing: 0.1em;
       }
 
-      /* ---------- DATA SOURCES ---------- */
+      /* =========================================================
+         DATA SOURCES
+         ========================================================= */
 
       .source-strip {
         display: grid;
+
         grid-template-columns: repeat(4, 1fr);
+
         border-top: 1px solid rgba(255, 255, 255, 0.07);
+
         border-bottom: 1px solid rgba(255, 255, 255, 0.07);
       }
 
       .source-item {
         padding: 20px 18px;
+
         border-right: 1px solid rgba(255, 255, 255, 0.07);
       }
 
@@ -979,30 +1556,47 @@
 
       .source-item strong {
         display: block;
+
         font-family: var(--font-display);
+
         font-size: 22px;
+
         font-weight: 800;
       }
 
       .source-item span {
         display: block;
+
         margin-top: 5px;
+
         font-family: var(--font-mono);
+
         font-size: 7px;
+
         line-height: 1.5;
+
         color: var(--text-2);
+
         letter-spacing: 0.08em;
       }
 
-      /* ---------- FINAL CTA ---------- */
+      /* =========================================================
+         FINAL CTA
+         ========================================================= */
 
       .home-cta {
         position: relative;
+
         overflow: hidden;
+
         min-height: 250px;
+
         margin-bottom: 65px;
+
         padding: 38px;
+
         border: 1px solid rgba(255, 255, 255, 0.09);
+
         background:
           radial-gradient(
             circle at 80% 30%,
@@ -1018,68 +1612,101 @@
 
       .home-cta::before {
         content: "NEPAL / 2020—2026 / ARCHIVE";
+
         position: absolute;
+
         right: 25px;
         top: 22px;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         letter-spacing: 0.13em;
+
         color: rgba(255, 255, 255, 0.25);
       }
 
       .home-cta h2 {
         max-width: 650px;
+
         margin: 0;
+
         font-family: var(--font-display);
+
         font-size: clamp(40px, 7vw, 76px);
+
         line-height: 0.84;
+
         letter-spacing: -0.04em;
       }
 
       .home-cta p {
         max-width: 570px;
+
         margin: 17px 0 0;
+
         font-size: 10px;
+
         line-height: 1.55;
+
         color: var(--text-2);
       }
 
       .home-cta-button {
         display: inline-flex;
+
         margin-top: 24px;
+
         padding: 13px 18px;
+
         border: 1px solid rgba(255, 255, 255, 0.16);
+
         background: rgba(255, 255, 255, 0.045);
+
         color: white;
+
         font-family: var(--font-mono);
+
         font-size: 8px;
+
         letter-spacing: 0.13em;
+
         cursor: pointer;
+
         transition: all 0.25s ease;
       }
 
       .home-cta-button:hover {
         background: rgba(255, 255, 255, 0.09);
+
         transform: translateY(-2px);
       }
 
-      /* ---------- SCROLL REVEAL ---------- */
+      /* =========================================================
+         SCROLL REVEAL
+         ========================================================= */
 
       .home-reveal {
         opacity: 0;
+
         transform: translateY(20px);
+
         animation: homeReveal 0.8s ease forwards;
       }
 
       .home-reveal.delay-1 {
         animation-delay: 0.12s;
       }
+
       .home-reveal.delay-2 {
         animation-delay: 0.22s;
       }
+
       .home-reveal.delay-3 {
         animation-delay: 0.32s;
       }
+
       .home-reveal.delay-4 {
         animation-delay: 0.42s;
       }
@@ -1087,11 +1714,14 @@
       @keyframes homeReveal {
         to {
           opacity: 1;
+
           transform: translateY(0);
         }
       }
 
-      /* ---------- MOBILE ---------- */
+      /* =========================================================
+         MOBILE
+         ========================================================= */
 
       @media (max-width: 900px) {
         .intel-strip {
@@ -1117,6 +1747,7 @@
 
         .home-map-info {
           border-left: 0;
+
           border-top: 1px solid rgba(255, 255, 255, 0.07);
         }
 
@@ -1135,6 +1766,18 @@
         .source-item:nth-child(-n + 2) {
           border-bottom: 1px solid rgba(255, 255, 255, 0.07);
         }
+
+        .cat-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .archive-banner {
+          grid-template-columns: 1fr 180px;
+        }
+
+        .archive-banner-title {
+          font-size: 34px;
+        }
       }
 
       @media (max-width: 600px) {
@@ -1148,7 +1791,9 @@
 
         .hero-intel-top {
           align-items: flex-start;
+
           flex-direction: column;
+
           gap: 8px;
         }
 
@@ -1166,6 +1811,7 @@
 
         .home-section-heading {
           align-items: flex-start;
+
           flex-direction: column;
         }
 
@@ -1192,14 +1838,40 @@
         .home-cta::before {
           display: none;
         }
+
+        .archive-banner {
+          display: block;
+
+          min-height: 0;
+        }
+
+        .archive-banner-content {
+          padding: 20px;
+        }
+
+        .archive-banner-title {
+          font-size: 34px;
+
+          white-space: normal;
+        }
+
+        .archive-banner-image {
+          min-height: 120px;
+
+          height: 120px;
+        }
+
+        .archive-banner-image img {
+          min-height: 120px;
+        }
       }
     </style>
   </head>
 
   <body>
     <!-- =========================================================
-       CINEMATIC SPLASH
-       ========================================================= -->
+         CINEMATIC SPLASH
+         ========================================================= -->
 
     <div id="splash">
       <svg viewBox="0 0 600 260" fill="none" aria-hidden="true">
@@ -1243,9 +1915,13 @@
         />
       </svg>
 
-      <div class="splash-word">GEO<span>NEPAL</span></div>
+      <div class="splash-word">
+        GEO<span>NEPAL</span>
+      </div>
 
-      <div class="splash-sub">Disaster Intelligence Archive · 2020—2026</div>
+      <div class="splash-sub">
+        Disaster Intelligence Archive · 2020—2026
+      </div>
 
       <div
         style="
@@ -1268,8 +1944,8 @@
     </div>
 
     <!-- =========================================================
-       HEADER
-       ========================================================= -->
+         HEADER
+         ========================================================= -->
 
     <header>
       <div class="brand">
@@ -1287,16 +1963,16 @@
 
       <nav class="mainnav" aria-label="Main navigation">
         <a href="#" id="navHome" class="active"> Home </a>
-
         <a href="#" id="navMap"> Map </a>
-
         <a href="#" id="navTimeline"> Timeline </a>
-
         <a href="#" id="navCompany"> Tarutium </a>
       </nav>
 
       <div class="header-right">
-        <div class="status-pill" title="Live earthquake data connection">
+        <div
+          class="status-pill"
+          title="Live earthquake data connection"
+        >
           <span class="live"></span>
           USGS LIVE
         </div>
@@ -1304,8 +1980,8 @@
     </header>
 
     <!-- =========================================================
-       HOME / HERO
-       ========================================================= -->
+         HOME / HERO
+         ========================================================= -->
 
     <section class="hero" id="heroSection">
       <div class="hero-bg"></div>
@@ -1349,23 +2025,30 @@
       <div class="hero-intel-top home-reveal">
         <div class="hero-intel-location">
           <span class="pulse"></span>
+
           <span>NEPAL / HIMALAYAN REGION</span>
         </div>
 
-        <div>27.7°N 85.3°E · ARCHIVE NODE 01</div>
+        <div>
+          27.7°N 85.3°E · ARCHIVE NODE 01
+        </div>
       </div>
 
       <!-- HERO TITLE -->
 
       <div class="hero-title-wrap home-reveal delay-1">
-        <div class="hero-kicker">DISASTER INTELLIGENCE PLATFORM</div>
+        <div class="hero-kicker">
+          DISASTER INTELLIGENCE PLATFORM
+        </div>
 
-        <h1>GEO<span class="accent">NEPAL</span></h1>
+        <h1>
+          GEO<span class="accent">NEPAL</span>
+        </h1>
 
         <p class="lede">
-          A visual intelligence archive of Nepal's floods, earthquakes and
-          landslides — built on live seismic data, structured incident records,
-          and ground-level media.
+          A visual intelligence archive of Nepal's floods,
+          earthquakes and landslides — built on live seismic data,
+          structured incident records, and ground-level media.
         </p>
 
         <div class="hero-subline">
@@ -1387,42 +2070,68 @@
 
       <div class="intel-strip home-reveal delay-2">
         <div class="intel-cell">
-          <div class="intel-label">Earthquake events</div>
+          <div class="intel-label">
+            Earthquake events
+          </div>
 
-          <div class="intel-value" id="homeEarthquakeTotal">—</div>
+          <div class="intel-value" id="homeEarthquakeTotal">
+            —
+          </div>
 
-          <div class="intel-note">USGS / LIVE CATALOG</div>
+          <div class="intel-note">
+            USGS / LIVE CATALOG
+          </div>
         </div>
 
         <div class="intel-cell">
-          <div class="intel-label">Flood records</div>
+          <div class="intel-label">
+            Flood records
+          </div>
 
-          <div class="intel-value" id="homeFloodTotal">—</div>
+          <div class="intel-value" id="homeFloodTotal">
+            —
+          </div>
 
-          <div class="intel-note">BIPAD / INCIDENT DATA</div>
+          <div class="intel-note">
+            BIPAD / INCIDENT DATA
+          </div>
         </div>
 
         <div class="intel-cell">
-          <div class="intel-label">Landslide records</div>
+          <div class="intel-label">
+            Landslide records
+          </div>
 
-          <div class="intel-value" id="homeLandslideTotal">—</div>
+          <div class="intel-value" id="homeLandslideTotal">
+            —
+          </div>
 
-          <div class="intel-note">INCIDENT ARCHIVE</div>
+          <div class="intel-note">
+            INCIDENT ARCHIVE
+          </div>
         </div>
 
         <div class="intel-cell">
-          <div class="intel-label">Data connection</div>
+          <div class="intel-label">
+            Data connection
+          </div>
 
-          <div class="intel-value intel-live">LIVE</div>
+          <div class="intel-value intel-live">
+            LIVE
+          </div>
 
-          <div class="intel-note">MULTI-SOURCE MONITORING</div>
+          <div class="intel-note">
+            MULTI-SOURCE MONITORING
+          </div>
         </div>
       </div>
 
       <!-- TICKER -->
 
       <div class="incident-ticker home-reveal delay-3">
-        <div class="ticker-label">LIVE SIGNAL</div>
+        <div class="ticker-label">
+          LIVE SIGNAL
+        </div>
 
         <div class="ticker-track">
           <span>NEPAL DISASTER INTELLIGENCE ARCHIVE</span>
@@ -1436,12 +2145,20 @@
 
       <!-- HOMEPAGE NEWS -->
 
-      <section class="home-news" id="homeNewsSection" style="display: none">
+      <section
+        class="home-news"
+        id="homeNewsSection"
+        style="display: none"
+      >
         <div class="home-news-head">
           <div>
-            <span class="eyebrow"> LATEST DISASTER DEVELOPMENTS </span>
+            <span class="eyebrow">
+              LATEST DISASTER DEVELOPMENTS
+            </span>
 
-            <div class="home-news-title">WHAT IS HAPPENING NOW</div>
+            <div class="home-news-title">
+              WHAT IS HAPPENING NOW
+            </div>
 
             <div class="home-news-sub">
               LIVE PUBLIC NEWS COVERAGE · FLOODS · EARTHQUAKES · LANDSLIDES
@@ -1460,118 +2177,35 @@
           </div>
         </div>
 
-        <div class="home-news-track" id="homeNewsTrack"></div>
+        <div
+          class="home-news-track"
+          id="homeNewsTrack"
+        ></div>
       </section>
 
-      <!-- DISASTER FEATURE STORY -->
+      <!-- =======================================================
+           ★ SELECT THE HAZARD — MAIN INTERACTION
+           MOVED ABOVE THE ARCHIVE
+           ======================================================= -->
 
-      <section class="home-section home-reveal delay-3">
+      <section
+        class="home-section hazard-selection home-reveal delay-3"
+      >
         <div class="home-section-heading">
           <div>
-            <span class="eyebrow"> THREE HAZARDS · ONE ARCHIVE </span>
+            <span class="eyebrow">
+              SELECT THE HAZARD
+            </span>
 
             <h2>
-              THE EVENTS<br />
-              WE TRACK.
+              CHOOSE A HAZARD.
             </h2>
           </div>
 
           <p>
-            GeoNepal brings together seismic activity, disaster incidents, media
-            and location data so individual events can be explored instead of
-            disappearing into a spreadsheet.
-          </p>
-        </div>
-
-        <div class="disaster-feature-grid">
-          <article
-            class="disaster-feature main-feature"
-            data-type="earthquake"
-            role="button"
-            tabindex="0"
-            aria-label="Explore earthquake records"
-          >
-            <div class="feature-number">01 / EARTHQUAKES</div>
-
-            <div class="feature-icon">◉</div>
-
-            <div class="feature-title">EARTH<br />QUAKES</div>
-
-            <div class="feature-description">
-              Live seismic events from the USGS catalog, mapped and filtered to
-              reveal activity across Nepal and the Himalayan region.
-            </div>
-
-            <div class="feature-corner">LIVE SEISMIC SIGNAL →</div>
-          </article>
-
-          <article
-            class="disaster-feature"
-            data-type="flood"
-            role="button"
-            tabindex="0"
-            aria-label="Explore flood records"
-          >
-            <div class="feature-number">02 / FLOODS</div>
-
-            <div class="feature-icon">≋</div>
-
-            <div
-              class="feature-title"
-              style="font-size: clamp(38px, 6vw, 64px)"
-            >
-              FLOODS
-            </div>
-
-            <div class="feature-description">
-              Riverine and monsoon flood incidents across Nepal's provinces,
-              preserved as searchable records.
-            </div>
-
-            <div class="feature-corner">EXPLORE FLOODS →</div>
-          </article>
-
-          <article
-            class="disaster-feature"
-            data-type="landslide"
-            role="button"
-            tabindex="0"
-            aria-label="Explore landslide records"
-          >
-            <div class="feature-number">03 / LANDSLIDES</div>
-
-            <div class="feature-icon">△</div>
-
-            <div
-              class="feature-title"
-              style="font-size: clamp(34px, 5.5vw, 58px)"
-            >
-              LAND<br />SLIDES
-            </div>
-
-            <div class="feature-description">
-              Terrain and slope-failure events across Nepal's hill and mountain
-              districts.
-            </div>
-
-            <div class="feature-corner">EXPLORE LANDSLIDES →</div>
-          </article>
-        </div>
-      </section>
-
-      <!-- CATEGORY CARDS -->
-
-      <div class="home-section home-reveal delay-4">
-        <div class="home-section-heading">
-          <div>
-            <span class="eyebrow"> EXPLORE THE ARCHIVE </span>
-
-            <h2>CHOOSE A HAZARD.</h2>
-          </div>
-
-          <p>
-            Browse incidents by year, province, district, severity, media type
-            or geographic location.
+            Enter the archive through the disaster type you want
+            to investigate. Explore incidents by year, location,
+            severity and media.
           </p>
         </div>
 
@@ -1585,14 +2219,21 @@
             role="button"
             aria-label="Explore flood records"
           >
-            <div class="cat-number">GEO / 01</div>
+            <div class="cat-number">
+              GEO / 01
+            </div>
 
-            <div class="cat-icon">🌊</div>
+            <div class="cat-icon">
+              🌊
+            </div>
 
-            <div class="cat-name">Floods</div>
+            <div class="cat-name">
+              Floods
+            </div>
 
             <div class="cat-desc">
-              Riverine and monsoon flood incidents across Nepal's provinces.
+              Riverine and monsoon flood incidents across
+              Nepal's provinces.
             </div>
 
             <div class="cat-meta">
@@ -1601,7 +2242,9 @@
                 incidents logged
               </div>
 
-              <div class="cat-explore">EXPLORE →</div>
+              <div class="cat-explore">
+                EXPLORE →
+              </div>
             </div>
           </div>
 
@@ -1614,14 +2257,21 @@
             role="button"
             aria-label="Explore earthquake records"
           >
-            <div class="cat-number">GEO / 02</div>
+            <div class="cat-number">
+              GEO / 02
+            </div>
 
-            <div class="cat-icon">🌍</div>
+            <div class="cat-icon">
+              🌍
+            </div>
 
-            <div class="cat-name">Earthquakes</div>
+            <div class="cat-name">
+              Earthquakes
+            </div>
 
             <div class="cat-desc">
-              Live seismic events from the USGS catalog, filtered to Nepal.
+              Live seismic events from the USGS catalog,
+              filtered to Nepal.
             </div>
 
             <div class="cat-meta">
@@ -1630,7 +2280,9 @@
                 incidents logged
               </div>
 
-              <div class="cat-explore">EXPLORE →</div>
+              <div class="cat-explore">
+                EXPLORE →
+              </div>
             </div>
           </div>
 
@@ -1643,15 +2295,21 @@
             role="button"
             aria-label="Explore landslide records"
           >
-            <div class="cat-number">GEO / 03</div>
+            <div class="cat-number">
+              GEO / 03
+            </div>
 
-            <div class="cat-icon">⛰</div>
+            <div class="cat-icon">
+              ⛰
+            </div>
 
-            <div class="cat-name">Landslides</div>
+            <div class="cat-name">
+              Landslides
+            </div>
 
             <div class="cat-desc">
-              Terrain and slope-failure events across hill and mountain
-              districts.
+              Terrain and slope-failure events across hill
+              and mountain districts.
             </div>
 
             <div class="cat-meta">
@@ -1660,25 +2318,218 @@
                 incidents logged
               </div>
 
-              <div class="cat-explore">EXPLORE →</div>
+              <div class="cat-explore">
+                EXPLORE →
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- HOMEPAGE MAP PREVIEW -->
+      <!-- =======================================================
+           ★ THREE HAZARDS · ONE ARCHIVE
+           NOW COMPACT + IMAGE
+           ======================================================= -->
+
+      <section
+        class="home-section archive-intro-section home-reveal delay-3"
+      >
+        <div class="home-section-heading">
+          <div>
+            <span class="eyebrow">
+              THREE HAZARDS · ONE ARCHIVE
+            </span>
+          </div>
+        </div>
+
+        <div class="archive-banner">
+          <div class="archive-banner-content">
+            <div class="archive-banner-copy">
+              <div class="archive-banner-kicker">
+                THE EVENTS WE TRACK
+              </div>
+
+              <div class="archive-banner-title">
+                ONE ARCHIVE. THREE HAZARDS.
+              </div>
+
+              <div class="archive-banner-description">
+                GeoNepal brings together seismic activity,
+                disaster incidents, media and location data so
+                individual events can be explored instead of
+                disappearing into a spreadsheet.
+              </div>
+            </div>
+          </div>
+
+          <div class="archive-banner-image">
+            <img
+              src="https://images.unsplash.com/photo-1521292270410-a8c4d716d518?auto=format&fit=crop&w=900&q=80"
+              alt="Mountain landscape representing Nepal's disaster archive"
+              loading="lazy"
+              onerror="
+                this.onerror=null;
+                this.src='https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=80';
+              "
+            />
+
+            <div class="archive-banner-image-label">
+              NEPAL / TERRAIN / ARCHIVE
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           DISASTER FEATURE STORY
+           ======================================================= -->
+
+      <section class="home-section home-reveal delay-3">
+        <div class="home-section-heading">
+          <div>
+            <span class="eyebrow">
+              HAZARD INTELLIGENCE
+            </span>
+
+            <h2>
+              THE RECORDS<br />
+              IN DETAIL.
+            </h2>
+          </div>
+
+          <p>
+            Open a hazard to move from the visual overview
+            into its complete incident archive.
+          </p>
+        </div>
+
+        <div class="disaster-feature-grid">
+          <!-- EARTHQUAKES -->
+
+          <article
+            class="disaster-feature main-feature"
+            data-type="earthquake"
+            role="button"
+            tabindex="0"
+            aria-label="Explore earthquake records"
+          >
+            <div class="feature-number">
+              01 / EARTHQUAKES
+            </div>
+
+            <div class="feature-icon">
+              ◉
+            </div>
+
+            <div class="feature-title">
+              EARTH<br />
+              QUAKES
+            </div>
+
+            <div class="feature-description">
+              Live seismic events from the USGS catalog,
+              mapped and filtered to reveal activity across
+              Nepal and the Himalayan region.
+            </div>
+
+            <div class="feature-corner">
+              LIVE SEISMIC SIGNAL →
+            </div>
+          </article>
+
+          <!-- FLOODS -->
+
+          <article
+            class="disaster-feature"
+            data-type="flood"
+            role="button"
+            tabindex="0"
+            aria-label="Explore flood records"
+          >
+            <div class="feature-number">
+              02 / FLOODS
+            </div>
+
+            <div class="feature-icon">
+              ≋
+            </div>
+
+            <div
+              class="feature-title"
+              style="font-size: clamp(38px, 6vw, 64px)"
+            >
+              FLOODS
+            </div>
+
+            <div class="feature-description">
+              Riverine and monsoon flood incidents across
+              Nepal's provinces, preserved as searchable
+              records.
+            </div>
+
+            <div class="feature-corner">
+              EXPLORE FLOODS →
+            </div>
+          </article>
+
+          <!-- LANDSLIDES -->
+
+          <article
+            class="disaster-feature"
+            data-type="landslide"
+            role="button"
+            tabindex="0"
+            aria-label="Explore landslide records"
+          >
+            <div class="feature-number">
+              03 / LANDSLIDES
+            </div>
+
+            <div class="feature-icon">
+              △
+            </div>
+
+            <div
+              class="feature-title"
+              style="font-size: clamp(34px, 5.5vw, 58px)"
+            >
+              LAND<br />
+              SLIDES
+            </div>
+
+            <div class="feature-description">
+              Terrain and slope-failure events across
+              Nepal's hill and mountain districts.
+            </div>
+
+            <div class="feature-corner">
+              EXPLORE LANDSLIDES →
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- =======================================================
+           HOMEPAGE MAP PREVIEW
+           ======================================================= -->
 
       <section class="home-section home-reveal delay-4">
         <div class="home-section-heading">
           <div>
-            <span class="eyebrow"> SPATIAL INTELLIGENCE </span>
+            <span class="eyebrow">
+              SPATIAL INTELLIGENCE
+            </span>
 
-            <h2>SEE WHERE<br />IT HAPPENS.</h2>
+            <h2>
+              SEE WHERE<br />
+              IT HAPPENS.
+            </h2>
           </div>
 
           <p>
-            Every mappable incident becomes a point in geographic context. Move
-            from a national overview to individual records.
+            Every mappable incident becomes a point in
+            geographic context. Move from a national overview
+            to individual records.
           </p>
         </div>
 
@@ -1707,137 +2558,215 @@
 
           <div class="home-map-info">
             <div>
-              <span class="eyebrow"> INCIDENT MAP </span>
+              <span class="eyebrow">
+                INCIDENT MAP
+              </span>
 
-              <h3>NEPAL<br />IN FOCUS.</h3>
+              <h3>
+                NEPAL<br />
+                IN FOCUS.
+              </h3>
 
               <p>
-                Explore disaster locations using the full interactive map.
-                Filter by hazard, year, province, district and severity.
+                Explore disaster locations using the full
+                interactive map. Filter by hazard, year,
+                province, district and severity.
               </p>
 
               <div class="map-stat-grid">
                 <div class="map-stat">
-                  <strong id="homeMapIncidentCount"> — </strong>
+                  <strong id="homeMapIncidentCount">
+                    —
+                  </strong>
 
-                  <span> INCIDENTS </span>
+                  <span>
+                    INCIDENTS
+                  </span>
                 </div>
 
                 <div class="map-stat">
-                  <strong> 7 </strong>
+                  <strong>
+                    7
+                  </strong>
 
-                  <span> PROVINCES </span>
+                  <span>
+                    PROVINCES
+                  </span>
                 </div>
 
                 <div class="map-stat">
-                  <strong> 2020 </strong>
+                  <strong>
+                    2020
+                  </strong>
 
-                  <span> ARCHIVE START </span>
+                  <span>
+                    ARCHIVE START
+                  </span>
                 </div>
 
                 <div class="map-stat">
-                  <strong> LIVE </strong>
+                  <strong>
+                    LIVE
+                  </strong>
 
-                  <span> SEISMIC DATA </span>
+                  <span>
+                    SEISMIC DATA
+                  </span>
                 </div>
               </div>
             </div>
 
-            <button class="map-open" id="homeMapButton" type="button">
-              <span> OPEN INTERACTIVE MAP </span>
+            <button
+              class="map-open"
+              id="homeMapButton"
+              type="button"
+            >
+              <span>
+                OPEN INTERACTIVE MAP
+              </span>
 
-              <span aria-hidden="true"> → </span>
+              <span aria-hidden="true">
+                →
+              </span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- MEDIA / FIELD INTELLIGENCE -->
+      <!-- =======================================================
+           MEDIA / FIELD INTELLIGENCE
+           ======================================================= -->
 
       <section class="home-section home-reveal delay-4">
         <div class="home-section-heading">
           <div>
-            <span class="eyebrow"> FIELD INTELLIGENCE </span>
+            <span class="eyebrow">
+              FIELD INTELLIGENCE
+            </span>
 
-            <h2>DATA NEEDS<br />CONTEXT.</h2>
+            <h2>
+              DATA NEEDS<br />
+              CONTEXT.
+            </h2>
           </div>
 
           <p>
-            News, images and video add the human and visual layer around
-            structured disaster records.
+            News, images and video add the human and visual
+            layer around structured disaster records.
           </p>
         </div>
 
         <div class="media-showcase">
           <div class="media-showcase-card">
-            <div class="media-showcase-index">MEDIA / 01</div>
+            <div class="media-showcase-index">
+              MEDIA / 01
+            </div>
 
-            <div class="media-showcase-icon">◉</div>
+            <div class="media-showcase-icon">
+              ◉
+            </div>
 
             <div class="media-showcase-text">
-              <strong> NEWS </strong>
+              <strong>
+                NEWS
+              </strong>
 
-              <span> PUBLIC DISASTER COVERAGE </span>
+              <span>
+                PUBLIC DISASTER COVERAGE
+              </span>
             </div>
           </div>
 
           <div class="media-showcase-card">
-            <div class="media-showcase-index">MEDIA / 02</div>
+            <div class="media-showcase-index">
+              MEDIA / 02
+            </div>
 
-            <div class="media-showcase-icon">▶</div>
+            <div class="media-showcase-icon">
+              ▶
+            </div>
 
             <div class="media-showcase-text">
-              <strong> VIDEO </strong>
+              <strong>
+                VIDEO
+              </strong>
 
-              <span> GROUND-LEVEL REPORTING </span>
+              <span>
+                GROUND-LEVEL REPORTING
+              </span>
             </div>
           </div>
 
           <div class="media-showcase-card">
-            <div class="media-showcase-index">MEDIA / 03</div>
+            <div class="media-showcase-index">
+              MEDIA / 03
+            </div>
 
-            <div class="media-showcase-icon">▣</div>
+            <div class="media-showcase-icon">
+              ▣
+            </div>
 
             <div class="media-showcase-text">
-              <strong> IMAGES </strong>
+              <strong>
+                IMAGES
+              </strong>
 
-              <span> REFERENCE VISUAL MEDIA </span>
+              <span>
+                REFERENCE VISUAL MEDIA
+              </span>
             </div>
           </div>
 
           <div class="media-showcase-card">
-            <div class="media-showcase-index">MEDIA / 04</div>
+            <div class="media-showcase-index">
+              MEDIA / 04
+            </div>
 
-            <div class="media-showcase-icon">+</div>
+            <div class="media-showcase-icon">
+              +
+            </div>
 
             <div class="media-showcase-text">
-              <strong> RECORDS </strong>
+              <strong>
+                RECORDS
+              </strong>
 
-              <span> STRUCTURED INCIDENT DATA </span>
+              <span>
+                STRUCTURED INCIDENT DATA
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- DATA SOURCES -->
+      <!-- =======================================================
+           DATA SOURCES
+           ======================================================= -->
 
       <section class="home-section home-reveal delay-4">
         <div class="home-section-heading">
           <div>
-            <span class="eyebrow"> TRANSPARENCY </span>
+            <span class="eyebrow">
+              TRANSPARENCY
+            </span>
 
-            <h2>WHERE THE<br />DATA COMES FROM.</h2>
+            <h2>
+              WHERE THE<br />
+              DATA COMES FROM.
+            </h2>
           </div>
 
           <p>
-            GeoNepal combines public data sources rather than presenting a
-            single opaque score or feed.
+            GeoNepal combines public data sources rather than
+            presenting a single opaque score or feed.
           </p>
         </div>
 
         <div class="source-strip">
           <div class="source-item">
-            <strong> USGS </strong>
+            <strong>
+              USGS
+            </strong>
 
             <span>
               LIVE EARTHQUAKE CATALOG<br />
@@ -1846,7 +2775,9 @@
           </div>
 
           <div class="source-item">
-            <strong> BIPAD </strong>
+            <strong>
+              BIPAD
+            </strong>
 
             <span>
               NEPAL DISASTER RECORDS<br />
@@ -1855,7 +2786,9 @@
           </div>
 
           <div class="source-item">
-            <strong> GDACS </strong>
+            <strong>
+              GDACS
+            </strong>
 
             <span>
               GLOBAL DISASTER ALERTS<br />
@@ -1864,7 +2797,9 @@
           </div>
 
           <div class="source-item">
-            <strong> PUBLIC MEDIA </strong>
+            <strong>
+              PUBLIC MEDIA
+            </strong>
 
             <span>
               NEWS · VIDEO · IMAGES<br />
@@ -1874,7 +2809,9 @@
         </div>
       </section>
 
-      <!-- FINAL CTA -->
+      <!-- =======================================================
+           FINAL CTA
+           ======================================================= -->
 
       <section class="home-section home-reveal delay-4">
         <div class="home-cta">
@@ -1884,12 +2821,17 @@
           </h2>
 
           <p>
-            Explore the record. Locate the event. Compare years. Follow the
-            timeline. GeoNepal turns scattered disaster information into a
-            visual archive built for exploration.
+            Explore the record. Locate the event. Compare years.
+            Follow the timeline. GeoNepal turns scattered
+            disaster information into a visual archive built
+            for exploration.
           </p>
 
-          <button class="home-cta-button" id="homeArchiveButton" type="button">
+          <button
+            class="home-cta-button"
+            id="homeArchiveButton"
+            type="button"
+          >
             ENTER THE FULL ARCHIVE →
           </button>
         </div>
@@ -1897,31 +2839,55 @@
     </section>
 
     <!-- =========================================================
-       ARCHIVE VIEW
-       ========================================================= -->
+         ARCHIVE VIEW
+         ========================================================= -->
 
     <section id="archiveView" style="display: none">
       <div class="archive-head">
-        <a href="#" class="back-link" id="backLink"> ← BACK TO NEPAL </a>
+        <a
+          href="#"
+          class="back-link"
+          id="backLink"
+        >
+          ← BACK TO NEPAL
+        </a>
 
         <div class="archive-title">
-          <h2 id="archTitle">FLOODS</h2>
+          <h2 id="archTitle">
+            FLOODS
+          </h2>
 
-          <span class="type-tag" id="archTag"> NEPAL </span>
+          <span
+            class="type-tag"
+            id="archTag"
+          >
+            NEPAL
+          </span>
         </div>
 
-        <p class="archive-summary" id="archSummary"></p>
+        <p
+          class="archive-summary"
+          id="archSummary"
+        ></p>
 
-        <div class="year-rail" id="yearRail"></div>
+        <div
+          class="year-rail"
+          id="yearRail"
+        ></div>
 
-        <div class="stats-bar" id="statsBar"></div>
+        <div
+          class="stats-bar"
+          id="statsBar"
+        ></div>
       </div>
 
       <!-- TOOLBAR -->
 
       <div class="toolbar">
         <div class="search-box">
-          <span aria-hidden="true"> ⌕ </span>
+          <span aria-hidden="true">
+            ⌕
+          </span>
 
           <input
             type="text"
@@ -1938,21 +2904,43 @@
           role="tablist"
           aria-label="Content type"
         >
-          <button class="filter-chip active" data-ct="all" type="button">
+          <button
+            class="filter-chip active"
+            data-ct="all"
+            type="button"
+          >
             ALL
           </button>
 
-          <button class="filter-chip" data-ct="news" type="button">NEWS</button>
+          <button
+            class="filter-chip"
+            data-ct="news"
+            type="button"
+          >
+            NEWS
+          </button>
 
-          <button class="filter-chip" data-ct="video" type="button">
+          <button
+            class="filter-chip"
+            data-ct="video"
+            type="button"
+          >
             VIDEOS
           </button>
 
-          <button class="filter-chip" data-ct="image" type="button">
+          <button
+            class="filter-chip"
+            data-ct="image"
+            type="button"
+          >
             IMAGES
           </button>
 
-          <button class="filter-chip" data-ct="incident" type="button">
+          <button
+            class="filter-chip"
+            data-ct="incident"
+            type="button"
+          >
             INCIDENTS
           </button>
         </div>
@@ -1962,7 +2950,9 @@
           id="provinceSelect"
           aria-label="Filter by province"
         >
-          <option value="all">All Provinces</option>
+          <option value="all">
+            All Provinces
+          </option>
         </select>
 
         <select
@@ -1970,7 +2960,9 @@
           id="districtSelect"
           aria-label="Filter by district"
         >
-          <option value="all">All Districts</option>
+          <option value="all">
+            All Districts
+          </option>
         </select>
 
         <select
@@ -1978,21 +2970,46 @@
           id="severitySelect"
           aria-label="Filter by severity"
         >
-          <option value="all">All Severity</option>
+          <option value="all">
+            All Severity
+          </option>
 
-          <option value="Low">Low</option>
+          <option value="Low">
+            Low
+          </option>
 
-          <option value="Moderate">Moderate</option>
+          <option value="Moderate">
+            Moderate
+          </option>
 
-          <option value="Severe">Severe</option>
+          <option value="Severe">
+            Severe
+          </option>
 
-          <option value="Critical">Critical</option>
+          <option value="Critical">
+            Critical
+          </option>
         </select>
 
-        <div class="view-toggle" role="group" aria-label="Archive view">
-          <button class="active" id="galleryBtn" type="button">GALLERY</button>
+        <div
+          class="view-toggle"
+          role="group"
+          aria-label="Archive view"
+        >
+          <button
+            class="active"
+            id="galleryBtn"
+            type="button"
+          >
+            GALLERY
+          </button>
 
-          <button id="mapBtn" type="button">MAP</button>
+          <button
+            id="mapBtn"
+            type="button"
+          >
+            MAP
+          </button>
         </div>
 
         <button
@@ -2008,13 +3025,28 @@
 
       <!-- GALLERY -->
 
-      <div class="archive-grid-wrap" id="galleryPane">
-        <div class="result-count" id="resultCount">LOADING RESULTS…</div>
+      <div
+        class="archive-grid-wrap"
+        id="galleryPane"
+      >
+        <div
+          class="result-count"
+          id="resultCount"
+        >
+          LOADING RESULTS…
+        </div>
 
-        <div class="tile-grid" id="tileGrid"></div>
+        <div
+          class="tile-grid"
+          id="tileGrid"
+        ></div>
 
         <div class="load-more-wrap">
-          <button class="load-more" id="loadMoreBtn" type="button">
+          <button
+            class="load-more"
+            id="loadMoreBtn"
+            type="button"
+          >
             LOAD MORE
           </button>
         </div>
@@ -2022,37 +3054,64 @@
 
       <!-- MAP -->
 
-      <div id="mapPane" style="display: none">
+      <div
+        id="mapPane"
+        style="display: none"
+      >
         <div class="map-frame">
           <div class="map-note">
-            Real map — OpenStreetMap. Markers sit at each incident's true
-            coordinates. Click a marker for details.
+            Real map — OpenStreetMap. Markers sit at each
+            incident's true coordinates. Click a marker for
+            details.
           </div>
 
-          <div id="leafletMap" aria-label="Nepal disaster incident map"></div>
+          <div
+            id="leafletMap"
+            aria-label="Nepal disaster incident map"
+          ></div>
 
-          <div class="map-legend" id="mapLegend"></div>
+          <div
+            class="map-legend"
+            id="mapLegend"
+          ></div>
         </div>
       </div>
 
       <!-- TIMELINE -->
 
-      <div class="timeline-section" id="timelineSection">
+      <div
+        class="timeline-section"
+        id="timelineSection"
+      >
         <div class="section-heading">
-          <h3>NEPAL DISASTER TIMELINE</h3>
+          <h3>
+            NEPAL DISASTER TIMELINE
+          </h3>
 
-          <span class="eyebrow" id="timelineEyebrow"> 2026 → 2020 </span>
+          <span
+            class="eyebrow"
+            id="timelineEyebrow"
+          >
+            2026 → 2020
+          </span>
         </div>
 
-        <div class="timeline-rail" id="timelineRail"></div>
+        <div
+          class="timeline-rail"
+          id="timelineRail"
+        ></div>
       </div>
     </section>
 
     <!-- =========================================================
-       TARUTIUM / ABOUT
-       ========================================================= -->
+         TARUTIUM / ABOUT
+         ========================================================= -->
 
-    <section class="page about-page" id="companyPage" style="display: none">
+    <section
+      class="page about-page"
+      id="companyPage"
+      style="display: none"
+    >
       <div class="about-bg">
         <svg
           class="about-contours"
@@ -2085,7 +3144,13 @@
       </div>
 
       <div class="page-inner about-inner">
-        <a href="#" class="back-link" id="companyBackLink"> ← BACK TO HOME </a>
+        <a
+          href="#"
+          class="back-link"
+          id="companyBackLink"
+        >
+          ← BACK TO HOME
+        </a>
 
         <img
           src="assets/tarutium-logo.jpeg"
@@ -2095,21 +3160,34 @@
         />
 
         <div class="about-fade">
-          <div class="eyebrow" style="margin-bottom: 14px">WHY THIS EXISTS</div>
+          <div
+            class="eyebrow"
+            style="margin-bottom: 14px"
+          >
+            WHY THIS EXISTS
+          </div>
 
-          <h2 class="page-title" style="font-size: clamp(32px, 5vw, 52px)">
+          <h2
+            class="page-title"
+            style="font-size: clamp(32px, 5vw, 52px)"
+          >
             Nepal lives with the ground moving beneath it.
           </h2>
 
-          <p class="page-lede" style="font-size: 16px; max-width: 640px">
-            Nepal sits along one of the most seismically active mountain belts
-            on Earth, where the Indian and Eurasian tectonic plates continue to
-            collide beneath the Himalaya. The same steep terrain that makes the
-            country's landscape extraordinary also makes it acutely vulnerable —
-            to earthquakes, to monsoon flooding, and to the landslides that
-            follow when saturated slopes give way. Thousands of smaller
-            incidents are recorded here every year, most of them never reaching
-            international attention.
+          <p
+            class="page-lede"
+            style="font-size: 16px; max-width: 640px"
+          >
+            Nepal sits along one of the most seismically active
+            mountain belts on Earth, where the Indian and
+            Eurasian tectonic plates continue to collide beneath
+            the Himalaya. The same steep terrain that makes the
+            country's landscape extraordinary also makes it
+            acutely vulnerable — to earthquakes, to monsoon
+            flooding, and to the landslides that follow when
+            saturated slopes give way. Thousands of smaller
+            incidents are recorded here every year, most of them
+            never reaching international attention.
           </p>
         </div>
 
@@ -2125,19 +3203,32 @@
             Why we built GeoNepal
           </h3>
 
-          <p class="page-lede" style="max-width: 640px">
-            Data about these events exists — scattered across government
-            portals, seismic catalogs, and international databases — but rarely
-            in one place, and rarely in a form anyone outside a technical team
-            can actually look at. GeoNepal exists to pull that real data
-            together: live from Nepal's BIPAD disaster portal, the USGS
-            earthquake catalog, and GDACS, presented as something a person can
-            actually explore, incident by incident, year by year.
+          <p
+            class="page-lede"
+            style="max-width: 640px"
+          >
+            Data about these events exists — scattered across
+            government portals, seismic catalogs, and
+            international databases — but rarely in one place,
+            and rarely in a form anyone outside a technical team
+            can actually look at. GeoNepal exists to pull that
+            real data together: live from Nepal's BIPAD disaster
+            portal, the USGS earthquake catalog, and GDACS,
+            presented as something a person can actually explore,
+            incident by incident, year by year.
           </p>
         </div>
 
-        <div class="about-fade" style="margin-top: 55px; max-width: 760px">
-          <div class="eyebrow" style="margin-bottom: 14px">DATA SOURCES</div>
+        <div
+          class="about-fade"
+          style="margin-top: 55px; max-width: 760px"
+        >
+          <div
+            class="eyebrow"
+            style="margin-bottom: 14px"
+          >
+            DATA SOURCES
+          </div>
 
           <div
             style="
@@ -2153,7 +3244,12 @@
                 background: rgba(255, 255, 255, 0.02);
               "
             >
-              <strong style="font-family: var(--font-display); font-size: 20px">
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
                 USGS
               </strong>
 
@@ -2176,7 +3272,12 @@
                 background: rgba(255, 255, 255, 0.02);
               "
             >
-              <strong style="font-family: var(--font-display); font-size: 20px">
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
                 BIPAD
               </strong>
 
@@ -2199,7 +3300,12 @@
                 background: rgba(255, 255, 255, 0.02);
               "
             >
-              <strong style="font-family: var(--font-display); font-size: 20px">
+              <strong
+                style="
+                  font-family: var(--font-display);
+                  font-size: 20px;
+                "
+              >
                 GDACS
               </strong>
 
@@ -2220,25 +3326,25 @@
     </section>
 
     <!-- =========================================================
-       FOOTER
-       ========================================================= -->
+         FOOTER
+         ========================================================= -->
 
     <footer>
       <span>
-        GEONEPAL — DISASTER INTELLIGENCE ARCHIVE · BUILT BY TARUTIUM GLOBAL
-        CONSULTING
+        GEONEPAL — DISASTER INTELLIGENCE ARCHIVE · BUILT BY
+        TARUTIUM GLOBAL CONSULTING
       </span>
 
       <span id="footerNote">
-        EARTHQUAKES: LIVE USGS + BIPAD · FLOODS/LANDSLIDES: LIVE BIPAD
-        (GDACS/DEMO FALLBACK) · NEWS: PUBLIC NEWS SOURCES · IMAGES: WIKIMEDIA
-        COMMONS REFERENCE MEDIA
+        EARTHQUAKES: LIVE USGS + BIPAD · FLOODS/LANDSLIDES:
+        LIVE BIPAD (GDACS/DEMO FALLBACK) · NEWS: PUBLIC NEWS
+        SOURCES · IMAGES: WIKIMEDIA COMMONS REFERENCE MEDIA
       </span>
     </footer>
 
     <!-- =========================================================
-       MODAL
-       ========================================================= -->
+         MODAL
+         ========================================================= -->
 
     <div
       id="modalOverlay"
@@ -2246,18 +3352,24 @@
       aria-modal="true"
       aria-label="Disaster record details"
     >
-      <div class="modal-panel" id="modalPanel"></div>
+      <div
+        class="modal-panel"
+        id="modalPanel"
+      ></div>
     </div>
 
     <!-- =========================================================
-       SCRIPTS
-       ========================================================= -->
+         SCRIPTS
+         ========================================================= -->
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
 
     <script src="js/data.js"></script>
+
     <script src="js/render.js"></script>
+
     <script src="js/main.js"></script>
   </body>
 </html>
-```

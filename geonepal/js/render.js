@@ -81,24 +81,65 @@ function getMediaSource(item) {
 }
 
 
-function imageFallbackHTML(seed) {
-  const safe = String(seed || "nepal")
+/*
+   Category-specific fallback images.
+
+   These are ONLY used when the real source image is missing/broken.
+   They are kept separate so a flood record never falls back to
+   an earthquake/landslide image and vice versa.
+*/
+function hazardFallbackSeed(type, seed) {
+  const cleanSeed = String(seed || "nepal")
     .replace(/[^a-zA-Z0-9_-]/g, "")
     .slice(0, 40);
 
-  return `https://picsum.photos/seed/geonepal-fallback-${safe || "nepal"}/900/600`;
+  const category =
+    String(type || "disaster")
+      .toLowerCase();
+
+  if (category === "flood") {
+    return `flood-${cleanSeed || "nepal"}`;
+  }
+
+  if (category === "landslide") {
+    return `landslide-${cleanSeed || "nepal"}`;
+  }
+
+  if (category === "earthquake") {
+    return `earthquake-${cleanSeed || "nepal"}`;
+  }
+
+  return `disaster-${cleanSeed || "nepal"}`;
 }
 
 
-function safeImageURL(url, seed) {
+function imageFallbackHTML(seed, type = "disaster") {
+  const safe =
+    hazardFallbackSeed(
+      type,
+      seed,
+    );
+
+  return `https://picsum.photos/seed/geonepal-${safe}/900/600`;
+}
+
+
+function safeImageURL(url, seed, type = "disaster") {
   if (!url || typeof url !== "string") {
-    return imageFallbackHTML(seed);
+    return imageFallbackHTML(
+      seed,
+      type,
+    );
   }
 
-  const value = url.trim();
+  const value =
+    url.trim();
 
   if (!value) {
-    return imageFallbackHTML(seed);
+    return imageFallbackHTML(
+      seed,
+      type,
+    );
   }
 
   if (
@@ -107,7 +148,10 @@ function safeImageURL(url, seed) {
     value.includes("placehold.co") ||
     value.endsWith(".svg")
   ) {
-    return imageFallbackHTML(seed);
+    return imageFallbackHTML(
+      seed,
+      type,
+    );
   }
 
   return value;
@@ -357,8 +401,15 @@ function renderHomeNews() {
     "earthquake",
     "landslide",
   ].forEach((type) => {
+    const mediaStore =
+      typeof MEDIA !== "undefined" &&
+      MEDIA
+        ? MEDIA
+        : {};
+
     const articles =
-      MEDIA?.[type]?.news || [];
+      mediaStore?.[type]?.news ||
+      [];
 
     articles.forEach(
       (article) => {
@@ -484,9 +535,11 @@ function renderHomeNews() {
                     index,
                   ),
                   `home-${index}`,
+                  article.disasterType,
                 )
               : imageFallbackHTML(
                   `home-${index}`,
+                  article.disasterType,
                 );
 
           const title =
@@ -628,9 +681,13 @@ function renderHomeNews() {
           img.dataset.fallback =
             "1";
 
+          const article =
+            news[index];
+
           img.src =
             imageFallbackHTML(
               `home-news-${index}`,
+              article?.disasterType,
             );
         };
       },
@@ -1237,6 +1294,7 @@ function renderGrid() {
           safeImageURL(
             t.tileImg,
             `${t.id}-${index}`,
+            t.disasterType,
           );
 
         const source =
@@ -1384,9 +1442,18 @@ function renderGrid() {
             image.dataset.fallback =
               "1";
 
+            const tile =
+              tiles.find(
+                (t) =>
+                  t.id ===
+                  el.dataset.id,
+              );
+
             image.src =
               imageFallbackHTML(
                 el.dataset.id,
+                tile?.disasterType ||
+                  state.disaster,
               );
           };
       }
@@ -1638,11 +1705,23 @@ function renderMap() {
 
     shown.forEach(
       (inc) => {
+        const lat =
+          Number(
+            inc.lat,
+          );
+
+        const lng =
+          Number(
+            inc.lng,
+          );
+
         if (
-          typeof inc.lat !==
-            "number" ||
-          typeof inc.lng !==
-            "number"
+          !Number.isFinite(
+            lat,
+          ) ||
+          !Number.isFinite(
+            lng,
+          )
         ) {
           return;
         }
@@ -1650,8 +1729,8 @@ function renderMap() {
         const marker =
           L.circleMarker(
             [
-              inc.lat,
-              inc.lng,
+              lat,
+              lng,
             ],
             {
               radius: 6,
@@ -2091,10 +2170,12 @@ async function openModal(
             inc,
           ),
           inc.id,
+          inc.disasterType,
         )
       : safeImageURL(
           inc.image,
           inc.id,
+          inc.disasterType,
         );
 
   const gallery =
@@ -2325,6 +2406,7 @@ async function openModal(
                           safeImageURL(
                             g,
                             `${inc.id}-${i}`,
+                            inc.disasterType,
                           ),
                         )}"
                         loading="lazy"
@@ -2696,6 +2778,7 @@ async function openModal(
         hero.src =
           imageFallbackHTML(
             inc.id,
+            inc.disasterType,
           );
       };
   }
@@ -2807,8 +2890,14 @@ async function openModal(
     gdeltBlock &&
     gdeltContent
   ) {
+    const mediaStore =
+      typeof MEDIA !== "undefined" &&
+      MEDIA
+        ? MEDIA
+        : {};
+
     const catNews =
-      MEDIA?.[
+      mediaStore?.[
         inc.disasterType
       ]?.news || [];
 
@@ -2927,11 +3016,23 @@ function renderMiniMap(
     return;
   }
 
+  const lat =
+    Number(
+      inc.lat,
+    );
+
+  const lng =
+    Number(
+      inc.lng,
+    );
+
   if (
-    typeof inc.lat !==
-      "number" ||
-    typeof inc.lng !==
-      "number"
+    !Number.isFinite(
+      lat,
+    ) ||
+    !Number.isFinite(
+      lng,
+    )
   ) {
     const container =
       document.getElementById(
@@ -2979,8 +3080,8 @@ function renderMiniMap(
         },
       ).setView(
         [
-          inc.lat,
-          inc.lng,
+          lat,
+          lng,
         ],
         9,
       );
@@ -3002,8 +3103,8 @@ function renderMiniMap(
 
     L.circleMarker(
       [
-        inc.lat,
-        inc.lng,
+        lat,
+        lng,
       ],
       {
         radius: 9,
@@ -3074,13 +3175,18 @@ function openMediaModal(
     ] ||
     TYPE_META.earthquake;
 
+  /*
+     Do not use item.url as an image source for news.
+     A news URL is an HTML page, not an image.
+  */
   const image =
     safeImageURL(
       item.tileImg ||
         item.image ||
-        item.url,
+        item.mediaData?.image,
       item.id ||
         "media",
+      item.disasterType,
     );
 
   panel.style.setProperty(
@@ -3331,6 +3437,7 @@ function openMediaModal(
           imageFallbackHTML(
             item.id ||
               "media",
+            item.disasterType,
           );
       };
   }
@@ -3456,6 +3563,7 @@ async function fetchYouTube(
                   video.thumbnailUrl ||
                   video.image,
                 `youtube-${inc.id}-${index}`,
+                inc.disasterType,
               );
 
             const channel =
@@ -3573,6 +3681,7 @@ async function fetchYouTube(
               img.src =
                 imageFallbackHTML(
                   `youtube-${inc.id}-${index}`,
+                  inc.disasterType,
                 );
             };
         },
