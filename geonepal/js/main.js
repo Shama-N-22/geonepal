@@ -33,6 +33,7 @@ function handleLogoError(img) {
   }
 }
 
+
 /* ================================================================
    VIEW SWITCHING
    ================================================================ */
@@ -40,37 +41,53 @@ function handleLogoError(img) {
 function setView(view) {
   state.view = view;
 
-  document.getElementById(
-    "galleryPane",
-  ).style.display =
-    view === "gallery"
-      ? "block"
-      : "none";
+  const galleryPane =
+    document.getElementById(
+      "galleryPane",
+    );
 
-  document.getElementById(
-    "mapPane",
-  ).style.display =
-    view === "map"
-      ? "block"
-      : "none";
+  const mapPane =
+    document.getElementById(
+      "mapPane",
+    );
 
-  document
-    .getElementById(
+  const galleryBtn =
+    document.getElementById(
       "galleryBtn",
-    )
-    .classList.toggle(
+    );
+
+  const mapBtn =
+    document.getElementById(
+      "mapBtn",
+    );
+
+  if (galleryPane) {
+    galleryPane.style.display =
+      view === "gallery"
+        ? "block"
+        : "none";
+  }
+
+  if (mapPane) {
+    mapPane.style.display =
+      view === "map"
+        ? "block"
+        : "none";
+  }
+
+  if (galleryBtn) {
+    galleryBtn.classList.toggle(
       "active",
       view === "gallery",
     );
+  }
 
-  document
-    .getElementById(
-      "mapBtn",
-    )
-    .classList.toggle(
+  if (mapBtn) {
+    mapBtn.classList.toggle(
       "active",
       view === "map",
     );
+  }
 
   if (view === "map") {
     setTimeout(
@@ -79,6 +96,7 @@ function setView(view) {
     );
   }
 }
+
 
 /* ================================================================
    ARCHIVE
@@ -109,9 +127,15 @@ function openArchive(type) {
   state.visibleCount =
     150;
 
-  document.getElementById(
-    "searchInput",
-  ).value = "";
+  const searchInput =
+    document.getElementById(
+      "searchInput",
+    );
+
+  if (searchInput) {
+    searchInput.value =
+      "";
+  }
 
   document
     .querySelectorAll(
@@ -125,57 +149,93 @@ function openArchive(type) {
       ),
     );
 
-  document.getElementById(
-    "provinceSelect",
-  ).value = "all";
+  const provinceSelect =
+    document.getElementById(
+      "provinceSelect",
+    );
 
-  document.getElementById(
-    "severitySelect",
-  ).value = "all";
+  if (provinceSelect) {
+    provinceSelect.value =
+      "all";
+  }
+
+  const severitySelect =
+    document.getElementById(
+      "severitySelect",
+    );
+
+  if (severitySelect) {
+    severitySelect.value =
+      "all";
+  }
 
   renderDistrictOptions();
 
-  document.getElementById(
-    "districtSelect",
-  ).value = "all";
+  const districtSelect =
+    document.getElementById(
+      "districtSelect",
+    );
+
+  if (districtSelect) {
+    districtSelect.value =
+      "all";
+  }
 
   const meta =
     TYPE_META[type];
 
-  document.getElementById(
-    "archTitle",
-  ).textContent =
-    meta.label.toUpperCase();
+  if (!meta) return;
 
-  document.getElementById(
-    "archTag",
-  ).textContent =
-    "NEPAL";
+  const archTitle =
+    document.getElementById(
+      "archTitle",
+    );
 
-  document.getElementById(
-    "archTag",
-  ).style.color =
-    meta.color;
+  if (archTitle) {
+    archTitle.textContent =
+      meta.label.toUpperCase();
+  }
 
-  document.getElementById(
-    "archTag",
-  ).style.borderColor =
-    meta.color;
+  const archTag =
+    document.getElementById(
+      "archTag",
+    );
 
-  document.getElementById(
-    "archSummary",
-  ).textContent =
-    `Explore ${meta.label.toLowerCase()} recorded across Nepal between 2020 and 2026. ${
-      type ===
-      "earthquake"
-        ? "Seismic records combine the live USGS Earthquake Catalog with ground-reported BIPAD incidents."
-        : "Incident records are pulled from Nepal's BIPAD disaster portal where available, with a clearly-labelled demonstration fallback when live data is unavailable."
-    }`;
+  if (archTag) {
+    archTag.textContent =
+      "NEPAL";
 
-  document.getElementById(
-    "timelineEyebrow",
-  ).textContent =
-    "2026 → 2020";
+    archTag.style.color =
+      meta.color;
+
+    archTag.style.borderColor =
+      meta.color;
+  }
+
+  const archSummary =
+    document.getElementById(
+      "archSummary",
+    );
+
+  if (archSummary) {
+    archSummary.textContent =
+      `Explore ${meta.label.toLowerCase()} recorded across Nepal between 2020 and 2026. ${
+        type ===
+        "earthquake"
+          ? "Seismic records combine the live USGS Earthquake Catalog with ground-reported BIPAD incidents."
+          : "Incident records are pulled from Nepal's BIPAD disaster portal where available, with a clearly-labelled demonstration fallback when live data is unavailable."
+      }`;
+  }
+
+  const timelineEyebrow =
+    document.getElementById(
+      "timelineEyebrow",
+    );
+
+  if (timelineEyebrow) {
+    timelineEyebrow.textContent =
+      "2026 → 2020";
+  }
 
   document.documentElement.style.setProperty(
     "--accent-tint",
@@ -190,64 +250,101 @@ function openArchive(type) {
 
   setView("gallery");
 
-  document.getElementById(
-    "heroSection",
-  ).style.display =
-    "none";
+  const heroSection =
+    document.getElementById(
+      "heroSection",
+    );
 
-  document.getElementById(
-    "archiveView",
-  ).style.display =
-    "block";
+  if (heroSection) {
+    heroSection.style.display =
+      "none";
+  }
+
+  const archiveView =
+    document.getElementById(
+      "archiveView",
+    );
+
+  if (archiveView) {
+    archiveView.style.display =
+      "block";
+  }
 
   window.scrollTo({
     top: 0,
     behavior: "instant",
   });
 }
+
 
 function closeArchive() {
-  document.getElementById(
-    "archiveView",
-  ).style.display =
-    "none";
+  const archiveView =
+    document.getElementById(
+      "archiveView",
+    );
 
-  document.getElementById(
-    "heroSection",
-  ).style.display =
-    "flex";
+  if (archiveView) {
+    archiveView.style.display =
+      "none";
+  }
+
+  const heroSection =
+    document.getElementById(
+      "heroSection",
+    );
+
+  if (heroSection) {
+    heroSection.style.display =
+      "flex";
+  }
 
   window.scrollTo({
     top: 0,
     behavior: "instant",
   });
 }
+
 
 /* ================================================================
    PAGE ROUTER
    ================================================================ */
 
 function showSection(name) {
-  document.getElementById(
-    "heroSection",
-  ).style.display =
-    name === "hero"
-      ? "flex"
-      : "none";
+  const heroSection =
+    document.getElementById(
+      "heroSection",
+    );
 
-  document.getElementById(
-    "archiveView",
-  ).style.display =
-    name === "archive"
-      ? "block"
-      : "none";
+  const archiveView =
+    document.getElementById(
+      "archiveView",
+    );
 
-  document.getElementById(
-    "companyPage",
-  ).style.display =
-    name === "company"
-      ? "block"
-      : "none";
+  const companyPage =
+    document.getElementById(
+      "companyPage",
+    );
+
+  if (heroSection) {
+    heroSection.style.display =
+      name === "hero"
+        ? "flex"
+        : "none";
+  }
+
+  if (archiveView) {
+    archiveView.style.display =
+      name === "archive"
+        ? "block"
+        : "none";
+  }
+
+  if (companyPage) {
+    companyPage.style.display =
+      name === "company"
+        ? "block"
+        : "none";
+  }
 
   document
     .querySelectorAll(
@@ -289,6 +386,7 @@ function showSection(name) {
     initAboutFadeIn();
   }
 }
+
 
 function initAboutFadeIn() {
   const els =
@@ -338,6 +436,7 @@ function initAboutFadeIn() {
   );
 }
 
+
 /* ================================================================
    EVENTS
    ================================================================ */
@@ -356,42 +455,75 @@ document
     );
   });
 
-document.getElementById(
-  "backLink",
-).onclick = (e) => {
-  e.preventDefault();
-  closeArchive();
-};
 
-document.getElementById(
-  "galleryBtn",
-).onclick = () =>
-  setView("gallery");
+const backLink =
+  document.getElementById(
+    "backLink",
+  );
 
-document.getElementById(
-  "mapBtn",
-).onclick = () =>
-  setView("map");
+if (backLink) {
+  backLink.onclick = (e) => {
+    e.preventDefault();
+    closeArchive();
+  };
+}
 
-document.getElementById(
-  "loadMoreBtn",
-).onclick = () => {
-  state.visibleCount +=
-    150;
 
-  renderGrid();
-};
+const galleryBtn =
+  document.getElementById(
+    "galleryBtn",
+  );
 
-document.getElementById(
-  "refreshBtn",
-).onclick = () =>
-  refreshLiveData();
+if (galleryBtn) {
+  galleryBtn.onclick = () =>
+    setView("gallery");
+}
 
-document
-  .getElementById(
+
+const mapBtn =
+  document.getElementById(
+    "mapBtn",
+  );
+
+if (mapBtn) {
+  mapBtn.onclick = () =>
+    setView("map");
+}
+
+
+const loadMoreBtn =
+  document.getElementById(
+    "loadMoreBtn",
+  );
+
+if (loadMoreBtn) {
+  loadMoreBtn.onclick = () => {
+    state.visibleCount +=
+      150;
+
+    renderGrid();
+  };
+}
+
+
+const refreshBtn =
+  document.getElementById(
+    "refreshBtn",
+  );
+
+if (refreshBtn) {
+  refreshBtn.onclick = () =>
+    refreshLiveData();
+}
+
+
+const searchInput =
+  document.getElementById(
     "searchInput",
-  )
-  .addEventListener(
+  );
+
+if (searchInput) {
+  searchInput.addEventListener(
     "input",
     (e) => {
       state.search =
@@ -403,6 +535,8 @@ document
       renderGrid();
     },
   );
+}
+
 
 document
   .querySelectorAll(
@@ -434,11 +568,14 @@ document
     };
   });
 
-document
-  .getElementById(
+
+const provinceSelect =
+  document.getElementById(
     "provinceSelect",
-  )
-  .addEventListener(
+  );
+
+if (provinceSelect) {
+  provinceSelect.addEventListener(
     "change",
     (e) => {
       state.province =
@@ -449,9 +586,15 @@ document
 
       renderDistrictOptions();
 
-      document.getElementById(
-        "districtSelect",
-      ).value = "all";
+      const districtSelect =
+        document.getElementById(
+          "districtSelect",
+        );
+
+      if (districtSelect) {
+        districtSelect.value =
+          "all";
+      }
 
       state.visibleCount =
         150;
@@ -461,12 +604,16 @@ document
       renderTimeline();
     },
   );
+}
 
-document
-  .getElementById(
+
+const districtSelect =
+  document.getElementById(
     "districtSelect",
-  )
-  .addEventListener(
+  );
+
+if (districtSelect) {
+  districtSelect.addEventListener(
     "change",
     (e) => {
       state.district =
@@ -480,12 +627,16 @@ document
       renderTimeline();
     },
   );
+}
 
-document
-  .getElementById(
+
+const severitySelect =
+  document.getElementById(
     "severitySelect",
-  )
-  .addEventListener(
+  );
+
+if (severitySelect) {
+  severitySelect.addEventListener(
     "change",
     (e) => {
       state.severity =
@@ -496,89 +647,145 @@ document
 
       renderGrid();
       renderStats();
+      renderTimeline();
+
+      if (
+        state.view ===
+        "map"
+      ) {
+        renderMap();
+      }
     },
   );
+}
+
 
 /* ================================================================
    NAVIGATION
    ================================================================ */
 
-document.getElementById(
-  "navHome",
-).onclick = (e) => {
-  e.preventDefault();
-
-  showSection("hero");
-};
-
-document.getElementById(
-  "navMap",
-).onclick = (e) => {
-  e.preventDefault();
-
-  if (state.disaster) {
-    showSection("archive");
-    setView("map");
-
-    document
-      .getElementById(
-        "archiveView",
-      )
-      .scrollIntoView();
-  }
-};
-
-document.getElementById(
-  "navTimeline",
-).onclick = (e) => {
-  e.preventDefault();
-
-  if (state.disaster) {
-    showSection("archive");
-
-    document
-      .getElementById(
-        "timelineSection",
-      )
-      .scrollIntoView({
-        behavior:
-          "smooth",
-      });
-  }
-};
-
-document.getElementById(
-  "navCompany",
-).onclick = (e) => {
-  e.preventDefault();
-
-  showSection(
-    "company",
+const navHome =
+  document.getElementById(
+    "navHome",
   );
-};
 
-document.getElementById(
-  "companyBackLink",
-).onclick = (e) => {
-  e.preventDefault();
+if (navHome) {
+  navHome.onclick = (e) => {
+    e.preventDefault();
 
-  showSection("hero");
-};
+    showSection("hero");
+  };
+}
+
+
+const navMap =
+  document.getElementById(
+    "navMap",
+  );
+
+if (navMap) {
+  navMap.onclick = (e) => {
+    e.preventDefault();
+
+    if (state.disaster) {
+      showSection("archive");
+      setView("map");
+
+      const archiveView =
+        document.getElementById(
+          "archiveView",
+        );
+
+      if (archiveView) {
+        archiveView.scrollIntoView();
+      }
+    } else {
+      showSection("hero");
+    }
+  };
+}
+
+
+const navTimeline =
+  document.getElementById(
+    "navTimeline",
+  );
+
+if (navTimeline) {
+  navTimeline.onclick = (e) => {
+    e.preventDefault();
+
+    if (state.disaster) {
+      showSection("archive");
+
+      const timelineSection =
+        document.getElementById(
+          "timelineSection",
+        );
+
+      if (timelineSection) {
+        timelineSection.scrollIntoView({
+          behavior:
+            "smooth",
+        });
+      }
+    } else {
+      showSection("hero");
+    }
+  };
+}
+
+
+const navCompany =
+  document.getElementById(
+    "navCompany",
+  );
+
+if (navCompany) {
+  navCompany.onclick = (e) => {
+    e.preventDefault();
+
+    showSection(
+      "company",
+    );
+  };
+}
+
+
+const companyBackLink =
+  document.getElementById(
+    "companyBackLink",
+  );
+
+if (companyBackLink) {
+  companyBackLink.onclick = (e) => {
+    e.preventDefault();
+
+    showSection("hero");
+  };
+}
+
 
 /* ================================================================
    SPLASH
    ================================================================ */
 
-document.getElementById(
-  "enterBtn",
-).onclick = () =>
-  document
-    .getElementById(
-      "splash",
-    )
-    .classList.add(
-      "hide",
-    );
+const enterBtn =
+  document.getElementById(
+    "enterBtn",
+  );
+
+if (enterBtn) {
+  enterBtn.onclick = () =>
+    document
+      .getElementById(
+        "splash",
+      )
+      ?.classList.add(
+        "hide",
+      );
+}
+
 
 document.body.addEventListener(
   "keydown",
@@ -592,15 +799,17 @@ document.body.addEventListener(
   },
 );
 
+
 setTimeout(() => {
   document
     .getElementById(
       "splash",
     )
-    .classList.add(
+    ?.classList.add(
       "hide",
     );
 }, 4200);
+
 
 /* ================================================================
    HERO VIDEO MARQUEE
@@ -617,8 +826,9 @@ async function loadHeroReel() {
       "heroReel",
     );
 
-  if (!track || !section)
+  if (!track || !section) {
     return;
+  }
 
   try {
     const q =
@@ -661,7 +871,9 @@ async function loadHeroReel() {
           const id =
             v?.id?.videoId;
 
-          if (!id) return false;
+          if (!id) {
+            return false;
+          }
 
           if (
             seen.has(id)
@@ -692,8 +904,32 @@ async function loadHeroReel() {
                 ?.medium
                 ?.url;
 
-            if (!thumb)
+            if (!thumb) {
               return "";
+            }
+
+            const title =
+              String(
+                v.snippet
+                  ?.title ||
+                  "",
+              )
+                .replace(
+                  /&/g,
+                  "&amp;",
+                )
+                .replace(
+                  /</g,
+                  "&lt;",
+                )
+                .replace(
+                  />/g,
+                  "&gt;",
+                )
+                .replace(
+                  /"/g,
+                  "&quot;",
+                );
 
             return `
               <a
@@ -703,14 +939,7 @@ async function loadHeroReel() {
                 )}"
                 target="_blank"
                 rel="noopener noreferrer"
-                title="${String(
-                  v.snippet
-                    ?.title ||
-                    "",
-                ).replace(
-                  /"/g,
-                  "&quot;",
-                )}"
+                title="${title}"
               >
 
                 <img
@@ -730,6 +959,13 @@ async function loadHeroReel() {
         )
         .join("");
 
+    if (!cardsHtml) {
+      section.style.display =
+        "none";
+
+      return;
+    }
+
     track.innerHTML =
       cardsHtml +
       cardsHtml;
@@ -743,6 +979,7 @@ async function loadHeroReel() {
       "none";
   }
 }
+
 
 /* ================================================================
    REFRESH
@@ -760,7 +997,8 @@ async function refreshLiveData() {
     );
 
   const original =
-    badge.textContent;
+    badge?.textContent ||
+    "● LIVE DATA";
 
   if (refresh) {
     refresh.disabled =
@@ -773,22 +1011,44 @@ async function refreshLiveData() {
       "rotate(180deg)";
   }
 
-  badge.textContent =
-    "● REFRESHING LIVE DATA…";
+  if (badge) {
+    badge.textContent =
+      "● REFRESHING LIVE DATA…";
+  }
 
   try {
     await loadLiveData();
 
-    await loadAllCommonsImages();
+    /*
+      Commons imagery is independent
+      from the incident feeds.
+    */
+    if (
+      typeof loadAllCommonsImages ===
+      "function"
+    ) {
+      await loadAllCommonsImages();
+    }
 
-    await loadAllCategoryMedia();
+    /*
+      News/video media loads after
+      the core incident feeds.
+    */
+    if (
+      typeof loadAllCategoryMedia ===
+      "function"
+    ) {
+      await loadAllCategoryMedia();
+    }
 
     renderHomeNews();
 
     updateHeroCounts();
 
-    badge.textContent =
-      "● LIVE DATA UPDATED JUST NOW";
+    if (badge) {
+      badge.textContent =
+        "● LIVE DATA UPDATED JUST NOW";
+    }
 
     if (state.disaster) {
       renderYearRail();
@@ -809,8 +1069,10 @@ async function refreshLiveData() {
       e,
     );
 
-    badge.textContent =
-      "● LIVE REFRESH FAILED · SHOWING LAST AVAILABLE DATA";
+    if (badge) {
+      badge.textContent =
+        "● LIVE REFRESH FAILED · SHOWING LAST AVAILABLE DATA";
+    }
   } finally {
     if (refresh) {
       refresh.disabled =
@@ -836,12 +1098,17 @@ async function refreshLiveData() {
   }
 }
 
+
 /* ================================================================
    INITIALIZATION
    ================================================================ */
 
 (async function init() {
   try {
+    /*
+      Build the initial UI before
+      contacting live services.
+    */
     renderProvinceOptions();
 
     renderDistrictOptions();
@@ -855,55 +1122,81 @@ async function refreshLiveData() {
         "liveBadge",
       );
 
-    badge.textContent =
-      "● CONNECTING TO LIVE DISASTER FEEDS…";
+    if (badge) {
+      badge.textContent =
+        "● CONNECTING TO LIVE DISASTER FEEDS…";
+    }
 
+    /*
+      Load the core disaster data.
+      If this succeeds, the dashboard
+      immediately has its main records.
+    */
     await loadLiveData();
 
     updateHeroCounts();
 
-    badge.textContent =
-      "● LIVE DATA CONNECTED";
+    if (badge) {
+      badge.textContent =
+        "● LIVE DATA CONNECTED";
+    }
 
     /*
-      Commons is independent from
-      the incident feeds.
+      Commons imagery is independent
+      from the incident feeds.
     */
-    await loadAllCommonsImages();
+    if (
+      typeof loadAllCommonsImages ===
+      "function"
+    ) {
+      await loadAllCommonsImages();
+    }
 
     updateHeroCounts();
 
     /*
-      Hero video strip can load
-      independently.
+      Hero video strip loads independently.
+      It should never block the archive.
     */
     loadHeroReel();
 
     /*
-      News/video media loads independently
-      so the main disaster dashboard doesn't
-      have to wait for every API.
+      Load news/video media before rendering
+      the homepage news section.
     */
-    loadAllCategoryMedia()
-      .then(() => {
-        renderHomeNews();
+    if (
+      typeof loadAllCategoryMedia ===
+      "function"
+    ) {
+      await loadAllCategoryMedia();
+    }
 
-        updateHeroCounts();
+    /*
+      IMPORTANT:
+      Render homepage news AFTER the media
+      request has completed.
+    */
+    renderHomeNews();
 
-        if (state.disaster) {
-          renderStats();
-          renderGrid();
-          renderTimeline();
-        }
-      })
-      .catch((e) => {
-        console.warn(
-          "Category media initialization failed",
-          e,
-        );
+    updateHeroCounts();
 
-        renderHomeNews();
-      });
+    /*
+      If an archive was already selected,
+      render its complete UI.
+    */
+    if (state.disaster) {
+      renderYearRail();
+      renderStats();
+      renderGrid();
+      renderTimeline();
+
+      if (
+        state.view ===
+        "map"
+      ) {
+        renderMap();
+      }
+    }
   } catch (e) {
     console.error(
       "GeoNepal initialization failed",
@@ -926,5 +1219,14 @@ async function refreshLiveData() {
       remains usable.
     */
     renderHomeNews();
+
+    updateHeroCounts();
+
+    if (state.disaster) {
+      renderYearRail();
+      renderStats();
+      renderGrid();
+      renderTimeline();
+    }
   }
 })();
