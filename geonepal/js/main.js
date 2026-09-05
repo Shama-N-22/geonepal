@@ -459,7 +459,7 @@ function initAboutFadeIn() {
 
 document
   .querySelectorAll(
-    ".cat-card",
+    ".cat-card, .disaster-feature",
   )
   .forEach((card) => {
     card.addEventListener(
@@ -478,6 +478,19 @@ document
         }
 
         openArchive(type);
+      },
+    );
+
+    card.addEventListener(
+      "keydown",
+      (e) => {
+        if (
+          (e.key === "Enter" || e.key === " ") &&
+          card.dataset.type
+        ) {
+          e.preventDefault();
+          openArchive(card.dataset.type);
+        }
       },
     );
   });
