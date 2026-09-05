@@ -376,326 +376,6 @@ function updateHeroCounts() {
 
 
 /* ================================================================
-   HOMEPAGE NEWS
-   ================================================================ */
-
-function renderHomeNews() {
-  const section =
-    document.getElementById(
-      "homeNewsSection",
-    );
-
-  const track =
-    document.getElementById(
-      "homeNewsTrack",
-    );
-
-  if (!section || !track) {
-    return;
-  }
-
-  const allNews = [];
-
-  [
-    "flood",
-    "earthquake",
-    "landslide",
-  ].forEach((type) => {
-    const mediaStore =
-      typeof MEDIA !== "undefined" &&
-      MEDIA
-        ? MEDIA
-        : {};
-
-    const articles =
-      mediaStore?.[type]?.news ||
-      [];
-
-    articles.forEach(
-      (article) => {
-        if (!article) {
-          return;
-        }
-
-        allNews.push({
-          ...article,
-          disasterType:
-            article.disasterType ||
-            type,
-        });
-      },
-    );
-  });
-
-  const seen =
-    new Set();
-
-  const news =
-    allNews
-      .filter((article) => {
-        const title =
-          String(
-            article.title || "",
-          )
-            .trim()
-            .toLowerCase();
-
-        const url =
-          String(
-            article.url || "",
-          )
-            .trim()
-            .toLowerCase();
-
-        const source =
-          String(
-            article.source ||
-              article.domain ||
-              "",
-          )
-            .trim()
-            .toLowerCase();
-
-        const key =
-          url ||
-          `${title}|${source}|${getArticleDate(
-            article,
-          )}`;
-
-        if (
-          !key ||
-          seen.has(key)
-        ) {
-          return false;
-        }
-
-        seen.add(key);
-
-        return true;
-      })
-      .sort(
-        (a, b) =>
-          getArticleDate(b) -
-          getArticleDate(a),
-      )
-      .slice(0, 12);
-
-  section.style.display =
-    "block";
-
-  if (!news.length) {
-    track.innerHTML = `
-      <div style="
-        width:100%;
-        padding:20px;
-        border:1px dashed var(--panel-border);
-        font-family:var(--font-mono);
-        font-size:11px;
-        color:var(--text-2);
-        background:rgba(255,255,255,.015);
-      ">
-        <strong style="
-          display:block;
-          color:var(--text-1);
-          margin-bottom:6px;
-        ">
-          NEWS FEED
-        </strong>
-
-        No current articles are available
-        from the configured public news
-        sources.
-
-        <br><br>
-
-        The dashboard will continue checking
-        when the feed refreshes.
-      </div>
-    `;
-
-    return;
-  }
-
-  track.innerHTML =
-    news
-      .map(
-        (article, index) => {
-          const meta =
-            TYPE_META[
-              article.disasterType
-            ] ||
-            TYPE_META.earthquake;
-
-          const image =
-            typeof getCardImage ===
-            "function"
-              ? safeImageURL(
-                  getCardImage(
-                    article,
-                    index,
-                  ),
-                  `home-${index}`,
-                  article.disasterType,
-                )
-              : imageFallbackHTML(
-                  `home-${index}`,
-                  article.disasterType,
-                );
-
-          const title =
-            article.title ||
-            "Nepal disaster news";
-
-          const source =
-            article.source ||
-            article.domain ||
-            "NEWS";
-
-          const date =
-            article.date ||
-            article.publishedAt ||
-            article.pubDate;
-
-          return `
-            <article
-              class="home-news-card"
-              data-news-index="${index}"
-              style="
-                border-top:2px solid ${meta.color};
-                cursor:pointer;
-              "
-            >
-              <div style="
-                position:relative;
-                overflow:hidden;
-                aspect-ratio:16/9;
-                background:var(--bg-2);
-              ">
-                <img
-                  src="${escapeHTML(
-                    image,
-                  )}"
-                  alt="${escapeHTML(
-                    title,
-                  )}"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                    display:block;
-                  "
-                >
-
-                <span style="
-                  position:absolute;
-                  top:8px;
-                  left:8px;
-                  padding:4px 7px;
-                  background:rgba(0,0,0,.78);
-                  border:1px solid ${meta.color};
-                  color:${meta.color};
-                  font:600 9px var(--font-mono);
-                  letter-spacing:.08em;
-                ">
-                  ${escapeHTML(
-                    meta.tag,
-                  )}
-                </span>
-              </div>
-
-              <div style="padding:12px;">
-                <div style="
-                  font:600 10px var(--font-mono);
-                  color:var(--text-2);
-                  margin-bottom:7px;
-                  white-space:nowrap;
-                  overflow:hidden;
-                  text-overflow:ellipsis;
-                ">
-                  ${escapeHTML(
-                    source,
-                  )}
-                  ${
-                    date
-                      ? ` · ${formatDate(
-                          date,
-                        )}`
-                      : ""
-                  }
-                </div>
-
-                <div style="
-                  font:700 17px var(--font-display);
-                  line-height:1.12;
-                  color:var(--text-0);
-                ">
-                  ${escapeHTML(
-                    title,
-                  )}
-                </div>
-              </div>
-            </article>
-          `;
-        },
-      )
-      .join("");
-
-  track
-    .querySelectorAll(
-      ".home-news-card",
-    )
-    .forEach((card) => {
-      card.onclick = () => {
-        const index =
-          Number(
-            card.dataset.newsIndex,
-          );
-
-        const article =
-          news[index];
-
-        if (article?.url) {
-          window.open(
-            article.url,
-            "_blank",
-            "noopener,noreferrer",
-          );
-        }
-      };
-    });
-
-  track
-    .querySelectorAll("img")
-    .forEach(
-      (img, index) => {
-        img.onerror = () => {
-          if (
-            img.dataset.fallback ===
-            "1"
-          ) {
-            return;
-          }
-
-          img.dataset.fallback =
-            "1";
-
-          const article =
-            news[index];
-
-          img.src =
-            imageFallbackHTML(
-              `home-news-${index}`,
-              article?.disasterType,
-            );
-        };
-      },
-    );
-}
-
-
-/* ================================================================
    YEAR RAIL
    ================================================================ */
 
@@ -3809,9 +3489,9 @@ document.addEventListener(
 
 /* ================================================================
    HAZARD INFO PAGE — builds the "Records in Detail" educational page
-   from HAZARD_INFO data. Real events section reuses already-loaded
-   real BIPAD/USGS data (DB) and real Wikimedia Commons photos
-   (COMMONS_CACHE) — no fabricated events or images.
+   from HAZARD_INFO data. Purely educational content — no archive/BIPAD
+   data pulled in here; the archive stays a separate destination via
+   the "Explore Records" button at the bottom.
    ================================================================ */
 function renderHazardInfo(type) {
   const info = HAZARD_INFO[type];
@@ -3819,122 +3499,72 @@ function renderHazardInfo(type) {
   if (!info || !container) return;
 
   const diagramHTML = info.diagram
-    .map((step, i) => `<span>${escapeHTML(step)}</span>${i < info.diagram.length - 1 ? '<span class="arrow">→</span>' : ''}`)
+    .map(function(step, i) {
+      return '<span>' + escapeHTML(step) + '</span>' + (i < info.diagram.length - 1 ? '<span class="arrow">→</span>' : '');
+    })
     .join("");
 
   const typesHTML = info.types
-    .map(t => `<div class="hi-grid-item"><div class="n">${escapeHTML(t.n)}</div><div class="t">${escapeHTML(t.t)}</div><p style="margin-top:8px;font-size:12.5px;">${escapeHTML(t.d)}</p></div>`)
+    .map(function(t) {
+      return '<div class="hi-grid-item"><div class="n">' + escapeHTML(t.n) + '</div><div class="t">' + escapeHTML(t.t) + '</div><p style="margin-top:8px;font-size:12.5px;">' + escapeHTML(t.d) + '</p></div>';
+    })
     .join("");
 
   const warningHTML = info.warningSigns
-    ? `<div class="hi-section">
-        <h3>Warning Signs</h3>
-        <div class="hi-grid">
-          ${info.warningSigns.map(w => `<div class="hi-grid-item"><p style="font-size:13px;">${escapeHTML(w)}</p></div>`).join("")}
-        </div>
-      </div>`
+    ? '<div class="hi-section"><h3>Warning Signs</h3><div class="hi-grid">' +
+      info.warningSigns.map(function(w) { return '<div class="hi-grid-item"><p style="font-size:13px;">' + escapeHTML(w) + '</p></div>'; }).join("") +
+      '</div></div>'
     : "";
 
-  const realIncidents = (DB[type] || [])
-    .filter(d => !d.demo)
-    .slice()
-    .sort((a, b) => b.date - a.date)
-    .slice(0, 3);
+  const whatIsLabel = info.label === "Earthquakes" ? "an Earthquake" : (info.label === "Floods" ? "a Flood" : "a Landslide");
+  const typesHeading = type === "earthquake" ? "Magnitude vs. Intensity" : "Types";
 
-  const eventsHTML = realIncidents.length
-    ? realIncidents.map(inc => `
-        <div class="hi-grid-item" style="cursor:pointer;" data-open-incident="${escapeHTML(inc.id)}">
-          <div class="n">${inc.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
-          <div class="t">${escapeHTML(inc.district)}, ${escapeHTML(inc.province)}</div>
-          <p style="margin-top:8px;font-size:12px;">${escapeHTML((inc.description||'').slice(0,110))}${(inc.description||'').length>110?'…':''}</p>
-        </div>
-      `).join("")
-    : `<div class="hi-note" style="margin-top:14px;">Live records for this hazard are still loading, or none are currently available — check the full archive below.</div>`;
+  container.innerHTML =
+    '<a href="#" class="hi-back" id="hazardInfoBack">← BACK TO GEONEPAL</a>' +
+    '<span class="hi-tag" style="color:' + info.color + ';border-color:' + info.color + '">' + info.tag + '</span>' +
+    '<h1 class="hi-title" style="white-space:pre-line;">' + info.title + '</h1>' +
+    '<p class="hi-lede">' + escapeHTML(info.intro) + '</p>' +
 
-  container.innerHTML = `
-    <a href="#" class="hi-back" id="hazardInfoBack">← BACK TO GEONEPAL</a>
+    '<div class="hi-section"><h3>What Is ' + whatIsLabel + '?</h3><p>' + escapeHTML(info.whatIs) + '</p></div>' +
 
-    <span class="hi-tag" style="color:${info.color};border-color:${info.color}">${info.tag}</span>
-    <h1 class="hi-title" style="white-space:pre-line;">${info.title}</h1>
-    <p class="hi-lede">${escapeHTML(info.intro)}</p>
+    '<div class="hi-section"><h3>Why ' + info.label + ' Are Common in Nepal</h3><ul class="hi-list">' +
+      info.whyNepal.map(function(w) { return '<li>' + escapeHTML(w) + '</li>'; }).join("") +
+    '</ul></div>' +
 
-    <div class="hi-section">
-      <h3>What Is ${info.label === 'Earthquakes' ? 'an Earthquake' : info.label === 'Floods' ? 'a Flood' : 'a Landslide'}?</h3>
-      <p>${escapeHTML(info.whatIs)}</p>
-    </div>
+    '<div class="hi-section"><h3>The Science, Simply</h3><p>' + escapeHTML(info.science) + '</p>' +
+      '<div class="hi-diagram">' + diagramHTML + '</div>' +
+    '</div>' +
 
-    <div class="hi-section">
-      <h3>Why ${info.label} Are Common in Nepal</h3>
-      <ul class="hi-list">
-        ${info.whyNepal.map(w => `<li>${escapeHTML(w)}</li>`).join("")}
-      </ul>
-    </div>
+    '<div class="hi-section"><h3>' + typesHeading + '</h3><div class="hi-grid">' + typesHTML + '</div></div>' +
 
-    <div class="hi-section">
-      <h3>The Science, Simply</h3>
-      <p>${escapeHTML(info.science)}</p>
-      <div class="hi-diagram">${diagramHTML}</div>
-    </div>
+    '<div class="hi-section"><h3>Why It Repeats</h3><p>' + escapeHTML(info.recurring) + '</p></div>' +
 
-    <div class="hi-section">
-      <h3>${type === 'earthquake' ? 'Magnitude vs. Intensity' : 'Types'}</h3>
-      <div class="hi-grid">${typesHTML}</div>
-    </div>
+    '<div class="hi-section"><h3>Reducing the Risk</h3><ul class="hi-list">' +
+      info.riskReduction.map(function(r) { return '<li>' + escapeHTML(r) + '</li>'; }).join("") +
+    '</ul><div class="hi-note">◆ ' + escapeHTML(info.riskReductionNote) + '</div></div>' +
 
-    <div class="hi-section">
-      <h3>Why It Repeats</h3>
-      <p>${escapeHTML(info.recurring)}</p>
-    </div>
+    warningHTML +
 
-    <div class="hi-section">
-      <h3>Reducing the Risk</h3>
-      <ul class="hi-list">
-        ${info.riskReduction.map(r => `<li>${escapeHTML(r)}</li>`).join("")}
-      </ul>
-      <div class="hi-note">◆ ${escapeHTML(info.riskReductionNote)}</div>
-    </div>
+    '<div class="hi-section"><h3>Emergency Guide</h3><div class="hi-emergency">' +
+      '<div class="hi-emergency-col"><div class="eh" style="color:' + info.color + '">BEFORE</div><ul>' +
+        info.before.map(function(b) { return '<li>' + escapeHTML(b) + '</li>'; }).join("") + '</ul></div>' +
+      '<div class="hi-emergency-col"><div class="eh" style="color:' + info.color + '">DURING</div><ul>' +
+        info.during.map(function(d) { return '<li>' + escapeHTML(d) + '</li>'; }).join("") + '</ul></div>' +
+      '<div class="hi-emergency-col"><div class="eh" style="color:' + info.color + '">AFTER</div><ul>' +
+        info.after.map(function(a) { return '<li>' + escapeHTML(a) + '</li>'; }).join("") + '</ul></div>' +
+    '</div></div>' +
 
-    ${warningHTML}
-
-    <div class="hi-section">
-      <h3>Emergency Guide</h3>
-      <div class="hi-emergency">
-        <div class="hi-emergency-col">
-          <div class="eh" style="color:${info.color}">BEFORE</div>
-          <ul>${info.before.map(b => `<li>${escapeHTML(b)}</li>`).join("")}</ul>
-        </div>
-        <div class="hi-emergency-col">
-          <div class="eh" style="color:${info.color}">DURING</div>
-          <ul>${info.during.map(d => `<li>${escapeHTML(d)}</li>`).join("")}</ul>
-        </div>
-        <div class="hi-emergency-col">
-          <div class="eh" style="color:${info.color}">AFTER</div>
-          <ul>${info.after.map(a => `<li>${escapeHTML(a)}</li>`).join("")}</ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="hi-section">
-      <h3>Real ${info.label} Recorded in Nepal</h3>
-      <div class="hi-grid">${eventsHTML}</div>
-    </div>
-
-    <div class="hi-cta">
-      <p>See every recorded incident, mapped and filterable by year, province and severity.</p>
-      <a href="#" class="hi-cta-btn" id="hazardInfoExplore" style="color:${info.color};border-color:${info.color}">EXPLORE ${info.tag} RECORDS →</a>
-    </div>
-  `;
+    '<div class="hi-cta"><p>See every real recorded incident for this hazard, mapped and filterable by year, province and severity.</p>' +
+      '<a href="#" class="hi-cta-btn" id="hazardInfoExplore" style="color:' + info.color + ';border-color:' + info.color + '">EXPLORE ' + info.tag + ' RECORDS →</a>' +
+    '</div>';
 
   const backLink = document.getElementById("hazardInfoBack");
-  if (backLink) backLink.onclick = (e) => { e.preventDefault(); showSection("hero"); };
+  if (backLink) {
+    backLink.onclick = function(e) { e.preventDefault(); showSection("hero"); };
+  }
 
   const exploreBtn = document.getElementById("hazardInfoExplore");
-  if (exploreBtn) exploreBtn.onclick = (e) => { e.preventDefault(); openArchive(type); };
-
-  container.querySelectorAll("[data-open-incident]").forEach(el => {
-    el.onclick = () => {
-      const inc = (DB[type] || []).find(d => d.id === el.dataset.openIncident);
-      if (inc) openModal(inc);
-    };
-  });
+  if (exploreBtn) {
+    exploreBtn.onclick = function(e) { e.preventDefault(); openArchive(type); };
+  }
 }

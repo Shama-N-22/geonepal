@@ -621,20 +621,6 @@ function noPhotoCard(labelLine1, labelLine2) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-/*
-  IMPORTANT:
-
-  Live BIPAD / USGS / GDACS records often contain the SVG
-  "NO VERIFIED PHOTO" placeholder.
-
-  We DO NOT use that placeholder as a dashboard thumbnail.
-
-  Instead:
-  1. Use a real image URL if available.
-  2. Ignore the internal SVG placeholder.
-  3. Use deterministic Picsum fallback.
-*/
-
 function getCardImage(item, index = 0) {
   const candidates = [
     item?.image,
@@ -653,10 +639,6 @@ function getCardImage(item, index = 0) {
 
     const value = candidate.trim();
 
-    /*
-      Ignore our generated "NO VERIFIED PHOTO"
-      and "NO ARTICLE IMAGE" SVG placeholders.
-    */
     if (
       value.startsWith("data:image/svg+xml") ||
       value.includes("NO%20VERIFIED%20PHOTO") ||
@@ -670,12 +652,6 @@ function getCardImage(item, index = 0) {
     return value;
   }
 
-  /*
-    Guaranteed photographic fallback.
-
-    Different IDs/seeds produce different images,
-    so live cards don't all get the same fallback.
-  */
   const rawSeed = String(
     item?.id ||
       item?.title ||
@@ -763,15 +739,6 @@ function newsNoImageCard() {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-/*
-  Remove duplicate images.
-
-  Handles:
-  - http vs https
-  - query strings
-  - trailing slashes
-  - Commons duplicate description pages
-*/
 function dedupeImages(images) {
   const seen = new Set();
 
@@ -1168,14 +1135,6 @@ async function loadBipadHazard(
         lat,
         lng,
 
-        /*
-          Keep the verified-photo placeholder for
-          the modal/data layer.
-
-          getCardImage() will intentionally ignore
-          this SVG and use a real fallback photo
-          for dashboard cards.
-        */
         image: noPhotoCard(
           district,
           date.toLocaleDateString(
@@ -1245,13 +1204,6 @@ async function loadGDACS() {
         const geom =
           f.geometry || {};
 
-        /*
-          IMPORTANT:
-          Never invent random disaster coordinates.
-
-          If GDACS doesn't provide geometry,
-          skip that event instead.
-        */
         const coordinates =
           Array.isArray(
             geom.coordinates
@@ -1735,11 +1687,6 @@ function dedupeNews(raw) {
       continue;
     }
 
-    /*
-      If two articles use exactly the same image,
-      keep only the first one so the IMAGES view
-      doesn't become a wall of duplicates.
-    */
     if (
       normImage &&
       seenImages.has(
@@ -2007,10 +1954,6 @@ function expandTiles(
 
   incidents.forEach(
     (inc, index) => {
-      /*
-        Every incident gets a guaranteed
-        dashboard thumbnail.
-      */
       tiles.push({
         ...inc,
 
@@ -2024,10 +1967,6 @@ function expandTiles(
           ),
       });
 
-      /*
-        Demo incidents also generate
-        image/news/video tiles.
-      */
       if (inc.demo) {
         const ic =
           inc.imageCount || 2;
@@ -2108,10 +2047,6 @@ function mediaTilesFor(
       video: [],
     };
 
-  /*
-    NEWS
-  */
-
   m.news.forEach(
     (a) => {
       if (
@@ -2146,9 +2081,6 @@ function mediaTilesFor(
           a.date ||
           new Date(),
 
-        /*
-          Guaranteed article image.
-        */
         tileImg:
           getCardImage(a),
 
@@ -2156,10 +2088,6 @@ function mediaTilesFor(
       });
     }
   );
-
-  /*
-    VIDEOS
-  */
 
   m.video.forEach(
     (v) => {
@@ -2202,14 +2130,6 @@ function mediaTilesFor(
       });
     }
   );
-
-  /*
-    WIKIMEDIA COMMONS IMAGES
-
-    Deduplicate before adding them to
-    the archive so the IMAGES section
-    doesn't show the same photo repeatedly.
-  */
 
   const uniqueCommons =
     dedupeImages(

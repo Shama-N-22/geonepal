@@ -830,11 +830,6 @@ nav.mainnav a.active {
 
 /* ===================== ARCHIVE IMAGE ===================== */
 
-/*
-   This supports the archive image element from the HTML
-   without changing the rest of the page.
-*/
-
 .archive-image {
   position: relative;
   width: 100%;
@@ -881,8 +876,6 @@ nav.mainnav a.active {
     );
   pointer-events: none;
 }
-
-/* Also support alternate archive image wrappers */
 
 .archive-media {
   position: relative;
@@ -2062,8 +2055,6 @@ header {
    ARCHIVE / HAZARD PRIORITY — FINAL OVERRIDES
    ========================================================= */
 
-/* Keep hazard selection visually dominant */
-
 .cat-grid {
   margin-top: 42px !important;
   margin-bottom: 0 !important;
@@ -2072,8 +2063,6 @@ header {
 .cat-card {
   min-height: 340px;
 }
-
-/* Compact archive section when it appears below */
 
 #archiveView .archive-head {
   padding-top: 32px !important;
@@ -2087,8 +2076,6 @@ header {
   font-size: clamp(30px, 4vw, 48px) !important;
 }
 
-/* Keep the archive title on one line on larger screens */
-
 @media (min-width: 901px) {
   #archiveView .archive-title {
     flex-wrap: nowrap !important;
@@ -2096,21 +2083,15 @@ header {
   }
 }
 
-/* Archive image remains compact */
-
 #archiveView .archive-image,
 #archiveView .archive-media {
   max-height: 150px;
 }
 
-/* Don't let archive image block clicks */
-
 .archive-image img,
 .archive-media img {
   pointer-events: none;
 }
-
-/* Mobile */
 
 @media (max-width: 600px) {
   header {
@@ -2170,6 +2151,97 @@ header {
     margin-left: 18px;
     margin-right: 18px;
   }
+}
+
+/* =========================================================
+   RECORDS-IN-DETAIL FIX — three equal cards, one row
+   ========================================================= */
+.disaster-feature-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.disaster-feature {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 220px;
+  padding: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.045),
+    rgba(255, 255, 255, 0.012)
+  );
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.disaster-feature:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.disaster-feature.main-feature {
+  min-height: 220px;
+  background:
+    radial-gradient(
+      circle at 80% 25%,
+      rgba(47, 168, 255, 0.13),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.01)
+    );
+}
+
+.feature-number {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-2);
+  letter-spacing: 0.15em;
+}
+
+.feature-icon {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  font-size: 26px;
+  opacity: 0.6;
+  filter: grayscale(0.25);
+}
+
+.feature-title {
+  position: relative;
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.feature-description {
+  position: relative;
+  margin-top: 8px;
+  font-size: 9.5px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.feature-corner {
+  position: relative;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--flood);
+  letter-spacing: 0.12em;
 }
 
 /* =========================================================
