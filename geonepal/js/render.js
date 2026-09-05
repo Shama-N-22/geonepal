@@ -3806,3 +3806,135 @@ document.addEventListener(
     }
   },
 );
+
+/* ================================================================
+   HAZARD INFO PAGE — builds the "Records in Detail" educational page
+   from HAZARD_INFO data. Real events section reuses already-loaded
+   real BIPAD/USGS data (DB) and real Wikimedia Commons photos
+   (COMMONS_CACHE) — no fabricated events or images.
+   ================================================================ */
+function renderHazardInfo(type) {
+  const info = HAZARD_INFO[type];
+  const container = document.getElementById("hazardInfoContent");
+  if (!info || !container) return;
+
+  const diagramHTML = info.diagram
+    .map((step, i) => `<span>${escapeHTML(step)}</span>${i < info.diagram.length - 1 ? '<span class="arrow">→</span>' : ''}`)
+    .join("");
+
+  const typesHTML = info.types
+    .map(t => `<div class="hi-grid-item"><div class="n">${escapeHTML(t.n)}</div><div class="t">${escapeHTML(t.t)}</div><p style="margin-top:8px;font-size:12.5px;">${escapeHTML(t.d)}</p></div>`)
+    .join("");
+
+  const warningHTML = info.warningSigns
+    ? `<div class="hi-section">
+        <h3>Warning Signs</h3>
+        <div class="hi-grid">
+          ${info.warningSigns.map(w => `<div class="hi-grid-item"><p style="font-size:13px;">${escapeHTML(w)}</p></div>`).join("")}
+        </div>
+      </div>`
+    : "";
+
+  const realIncidents = (DB[type] || [])
+    .filter(d => !d.demo)
+    .slice()
+    .sort((a, b) => b.date - a.date)
+    .slice(0, 3);
+
+  const eventsHTML = realIncidents.length
+    ? realIncidents.map(inc => `
+        <div class="hi-grid-item" style="cursor:pointer;" data-open-incident="${escapeHTML(inc.id)}">
+          <div class="n">${inc.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
+          <div class="t">${escapeHTML(inc.district)}, ${escapeHTML(inc.province)}</div>
+          <p style="margin-top:8px;font-size:12px;">${escapeHTML((inc.description||'').slice(0,110))}${(inc.description||'').length>110?'…':''}</p>
+        </div>
+      `).join("")
+    : `<div class="hi-note" style="margin-top:14px;">Live records for this hazard are still loading, or none are currently available — check the full archive below.</div>`;
+
+  container.innerHTML = `
+    <a href="#" class="hi-back" id="hazardInfoBack">← BACK TO GEONEPAL</a>
+
+    <span class="hi-tag" style="color:${info.color};border-color:${info.color}">${info.tag}</span>
+    <h1 class="hi-title" style="white-space:pre-line;">${info.title}</h1>
+    <p class="hi-lede">${escapeHTML(info.intro)}</p>
+
+    <div class="hi-section">
+      <h3>What Is ${info.label === 'Earthquakes' ? 'an Earthquake' : info.label === 'Floods' ? 'a Flood' : 'a Landslide'}?</h3>
+      <p>${escapeHTML(info.whatIs)}</p>
+    </div>
+
+    <div class="hi-section">
+      <h3>Why ${info.label} Are Common in Nepal</h3>
+      <ul class="hi-list">
+        ${info.whyNepal.map(w => `<li>${escapeHTML(w)}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="hi-section">
+      <h3>The Science, Simply</h3>
+      <p>${escapeHTML(info.science)}</p>
+      <div class="hi-diagram">${diagramHTML}</div>
+    </div>
+
+    <div class="hi-section">
+      <h3>${type === 'earthquake' ? 'Magnitude vs. Intensity' : 'Types'}</h3>
+      <div class="hi-grid">${typesHTML}</div>
+    </div>
+
+    <div class="hi-section">
+      <h3>Why It Repeats</h3>
+      <p>${escapeHTML(info.recurring)}</p>
+    </div>
+
+    <div class="hi-section">
+      <h3>Reducing the Risk</h3>
+      <ul class="hi-list">
+        ${info.riskReduction.map(r => `<li>${escapeHTML(r)}</li>`).join("")}
+      </ul>
+      <div class="hi-note">◆ ${escapeHTML(info.riskReductionNote)}</div>
+    </div>
+
+    ${warningHTML}
+
+    <div class="hi-section">
+      <h3>Emergency Guide</h3>
+      <div class="hi-emergency">
+        <div class="hi-emergency-col">
+          <div class="eh" style="color:${info.color}">BEFORE</div>
+          <ul>${info.before.map(b => `<li>${escapeHTML(b)}</li>`).join("")}</ul>
+        </div>
+        <div class="hi-emergency-col">
+          <div class="eh" style="color:${info.color}">DURING</div>
+          <ul>${info.during.map(d => `<li>${escapeHTML(d)}</li>`).join("")}</ul>
+        </div>
+        <div class="hi-emergency-col">
+          <div class="eh" style="color:${info.color}">AFTER</div>
+          <ul>${info.after.map(a => `<li>${escapeHTML(a)}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="hi-section">
+      <h3>Real ${info.label} Recorded in Nepal</h3>
+      <div class="hi-grid">${eventsHTML}</div>
+    </div>
+
+    <div class="hi-cta">
+      <p>See every recorded incident, mapped and filterable by year, province and severity.</p>
+      <a href="#" class="hi-cta-btn" id="hazardInfoExplore" style="color:${info.color};border-color:${info.color}">EXPLORE ${info.tag} RECORDS →</a>
+    </div>
+  `;
+
+  const backLink = document.getElementById("hazardInfoBack");
+  if (backLink) backLink.onclick = (e) => { e.preventDefault(); showSection("hero"); };
+
+  const exploreBtn = document.getElementById("hazardInfoExplore");
+  if (exploreBtn) exploreBtn.onclick = (e) => { e.preventDefault(); openArchive(type); };
+
+  container.querySelectorAll("[data-open-incident]").forEach(el => {
+    el.onclick = () => {
+      const inc = (DB[type] || []).find(d => d.id === el.dataset.openIncident);
+      if (inc) openModal(inc);
+    };
+  });
+}

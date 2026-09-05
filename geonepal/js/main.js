@@ -340,6 +340,11 @@ function showSection(name) {
       "companyPage",
     );
 
+  const hazardInfoPage =
+    document.getElementById(
+      "hazardInfoPage",
+    );
+
   if (heroSection) {
     heroSection.style.display =
       name === "hero"
@@ -357,6 +362,13 @@ function showSection(name) {
   if (companyPage) {
     companyPage.style.display =
       name === "company"
+        ? "block"
+        : "none";
+  }
+
+  if (hazardInfoPage) {
+    hazardInfoPage.style.display =
+      name === "hazardInfo"
         ? "block"
         : "none";
   }
@@ -459,7 +471,7 @@ function initAboutFadeIn() {
 
 document
   .querySelectorAll(
-    ".cat-card, .disaster-feature",
+    ".cat-card",
   )
   .forEach((card) => {
     card.addEventListener(
@@ -490,6 +502,44 @@ document
         ) {
           e.preventDefault();
           openArchive(card.dataset.type);
+        }
+      },
+    );
+  });
+
+document
+  .querySelectorAll(
+    ".disaster-feature",
+  )
+  .forEach((card) => {
+    card.addEventListener(
+      "click",
+      () => {
+        const type =
+          card.dataset.type;
+
+        if (!type) {
+          console.warn(
+            "Disaster feature card is missing data-type:",
+            card,
+          );
+
+          return;
+        }
+
+        openHazardInfo(type);
+      },
+    );
+
+    card.addEventListener(
+      "keydown",
+      (e) => {
+        if (
+          (e.key === "Enter" || e.key === " ") &&
+          card.dataset.type
+        ) {
+          e.preventDefault();
+          openHazardInfo(card.dataset.type);
         }
       },
     );
@@ -1087,10 +1137,6 @@ async function refreshLiveData() {
   try {
     await loadLiveData();
 
-    /*
-      Commons imagery is independent
-      from the incident feeds.
-    */
     if (
       typeof loadAllCommonsImages ===
       "function"
@@ -1098,18 +1144,12 @@ async function refreshLiveData() {
       await loadAllCommonsImages();
     }
 
-    /*
-      News/video media loads after
-      the core incident feeds.
-    */
     if (
       typeof loadAllCategoryMedia ===
       "function"
     ) {
       await loadAllCategoryMedia();
     }
-
-    renderHomeNews();
 
     updateHeroCounts();
 
@@ -1173,11 +1213,6 @@ async function refreshLiveData() {
 
 (async function init() {
   try {
-    /*
-      Build the initial UI before
-      contacting live services.
-    */
-
     renderProvinceOptions();
 
     renderDistrictOptions();
@@ -1196,12 +1231,6 @@ async function refreshLiveData() {
         "● CONNECTING TO LIVE DISASTER FEEDS…";
     }
 
-    /*
-      Load the core disaster data.
-      If this succeeds, the dashboard
-      immediately has its main records.
-    */
-
     await loadLiveData();
 
     updateHeroCounts();
@@ -1210,11 +1239,6 @@ async function refreshLiveData() {
       badge.textContent =
         "● LIVE DATA CONNECTED";
     }
-
-    /*
-      Commons imagery is independent
-      from the incident feeds.
-    */
 
     if (
       typeof loadAllCommonsImages ===
@@ -1225,17 +1249,7 @@ async function refreshLiveData() {
 
     updateHeroCounts();
 
-    /*
-      Hero video strip loads independently.
-      It should never block the archive.
-    */
-
     loadHeroReel();
-
-    /*
-      Load news/video media before rendering
-      the homepage news section.
-    */
 
     if (
       typeof loadAllCategoryMedia ===
@@ -1244,20 +1258,7 @@ async function refreshLiveData() {
       await loadAllCategoryMedia();
     }
 
-    /*
-      IMPORTANT:
-      Render homepage news AFTER the media
-      request has completed.
-    */
-
-    renderHomeNews();
-
     updateHeroCounts();
-
-    /*
-      If an archive was already selected,
-      render its complete UI.
-    */
 
     if (state.disaster) {
       renderYearRail();
@@ -1288,14 +1289,7 @@ async function refreshLiveData() {
         "● LIVE SERVICES UNAVAILABLE · ARCHIVE STILL AVAILABLE";
     }
 
-    /*
-      Even if one live service fails,
-      the existing demo/previous data
-      remains usable.
-    */
-
     try {
-      renderHomeNews();
       updateHeroCounts();
 
       if (state.disaster) {
@@ -1312,3 +1306,24 @@ async function refreshLiveData() {
     }
   }
 })();
+
+
+/* ================================================================
+   HAZARD INFO PAGE — "Records in Detail" destination, separate from
+   the "Select the Hazard" archive entry point.
+   ================================================================ */
+function openHazardInfo(type) {
+  renderHazardInfo(type);
+
+  const heroSection = document.getElementById("heroSection");
+  const archiveView = document.getElementById("archiveView");
+  const companyPage = document.getElementById("companyPage");
+  const hazardInfoPage = document.getElementById("hazardInfoPage");
+
+  if (heroSection) heroSection.style.display = "none";
+  if (archiveView) archiveView.style.display = "none";
+  if (companyPage) companyPage.style.display = "none";
+  if (hazardInfoPage) hazardInfoPage.style.display = "block";
+
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
